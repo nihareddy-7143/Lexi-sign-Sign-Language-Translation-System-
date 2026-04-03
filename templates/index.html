@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LEXISIGN — Bidirectional ISL Translator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&family=Syne:wght@700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body>
+    <!-- ── NAV ──────────────────────────────────────────────── -->
+    <nav class="nav">
+      <div class="nav-brand">
+        <div class="logo-icon">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+            <rect width="36" height="36" rx="10" fill="url(#lg)" />
+            <path
+              d="M10 26 L18 10 L26 26"
+              stroke="white"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M13 21 L23 21"
+              stroke="white"
+              stroke-width="2.5"
+              stroke-linecap="round"
+            />
+            <circle cx="26" cy="12" r="3" fill="#00FFB2" />
+            <defs>
+              <linearGradient id="lg" x1="0" y1="0" x2="36" y2="36">
+                <stop stop-color="#6C3AFF" />
+                <stop offset="1" stop-color="#00B4FF" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div>
+          <span class="brand-name">LEXISIGN</span>
+          <span class="brand-sub">BIDIRECTIONAL ISL TRANSLATOR</span>
+        </div>
+      </div>
+
+      <div class="nav-tabs">
+        <button class="tab active" data-tab="interpreter">
+          <span class="tab-dot red"></span> Live Interpreter
+        </button>
+        <button class="tab" data-tab="collect">
+          <span class="tab-dot purple"></span> Collect Data
+        </button>
+        <button class="tab" data-tab="train">
+          <span class="tab-dot green"></span> Train Model
+        </button>
+      </div>
+
+      <div class="model-badge" id="modelBadge">
+        <span class="badge-dot"></span>
+        <span id="badgeText"
+          >Model ready ({{ letter_classes }}L / {{ word_classes }}W)</span
+        >
+      </div>
+    </nav>
+
+    <!-- ── INTERPRETER TAB ──────────────────────────────────── -->
+    <div class="tab-content active" id="tab-interpreter">
+      <div class="interpreter-layout">
+        <!-- Camera area -->
+        <div class="camera-section">
+          <div class="camera-wrap" id="cameraWrap">
+            <img
+              id="videoFeed"
+              src=""
+              style="
+                display: none;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border-radius: 12px;
+              "
+            />
+            <div class="camera-placeholder" id="cameraPlaceholder">
+              <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+                <rect width="56" height="56" rx="16" fill="#1a1a2e" />
+                <path
+                  d="M14 20h4l3-4h10l3 4h4a2 2 0 012 2v18a2 2 0 01-2 2H14a2 2 0 01-2-2V22a2 2 0 012-2z"
+                  stroke="#444"
+                  stroke-width="1.5"
+                  fill="none"
+                />
+                <circle
+                  cx="28"
+                  cy="31"
+                  r="6"
+                  stroke="#444"
+                  stroke-width="1.5"
+                />
+              </svg>
+              <p>Start camera to begin</p>
+            </div>
+
+            <!-- Overlay UI on camera -->
+            <div class="cam-overlay" id="camOverlay" style="display: none">
+              <div class="overlay-top">
+                <div class="detection-badge" id="detectionBadge"></div>
+                <div
+                  class="hold-bar-wrap"
+                  id="holdBarWrap"
+                  style="display: none"
+                >
+                  <div class="hold-bar">
+                    <div class="hold-fill" id="holdFill"></div>
+                  </div>
+                  <span class="hold-label">HOLD</span>
+                </div>
+              </div>
+
+              <div class="overlay-bottom">
+                <!-- Sentence display -->
+                <div class="sentence-display">
+                  <span class="sentence-label">SENTENCE</span>
+                  <span class="sentence-text" id="sentenceText">—</span>
+                </div>
+                <!-- Translated -->
+                <div
+                  class="translated-display"
+                  id="translatedDisplay"
+                  style="display: none"
+                >
+                  <span class="sentence-label" id="translatedLang">HI</span>
+                  <span class="sentence-text" id="translatedText"></span>
+                </div>
+                <!-- Final corrected -->
+                <div
+                  class="final-display"
+                  id="finalDisplay"
+                  style="display: none"
+                >
+                  <span class="sentence-label">✦ NLP</span>
+                  <span class="sentence-text" id="finalText"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Spelling bar below camera -->
+          <div class="spell-bar" id="spellBar" style="display: none">
+            <span class="spell-label">SPELLING</span>
+            <span class="spell-word" id="spellWord">_</span>
+            <div class="suggestions" id="suggestions"></div>
+          </div>
+        </div>
+
+        <!-- Side panel -->
+        <div class="side-panel">
+          <!-- Camera control -->
+          <div class="panel-card">
+            <div class="card-title">CAMERA CONTROL</div>
+            <button class="btn-primary" id="btnCamera" onclick="toggleCamera()">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+              >
+                <path d="M6 4l6 4-6 4V4z" />
+              </svg>
+              Start Camera
+            </button>
+            <button class="btn-secondary" onclick="sendAction('clear')">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+              >
+                <path d="M2 2l10 10M12 2L2 12" />
+              </svg>
+              Clear Sentence
+            </button>
+          </div>
+
+          <!-- Mode & Language -->
+          <div class="panel-card" id="controlsCard" style="display: none">
+            <div class="card-title">CONTROLS</div>
+            <div class="mode-toggle">
+              <button
+                class="mode-btn active"
+                id="btnLetter"
+                onclick="setMode('LETTER')"
+              >
+                ✋ LETTER
+              </button>
+              <button class="mode-btn" id="btnWord" onclick="setMode('WORD')">
+                🤟 WORD
+              </button>
+            </div>
+            <div class="lang-row">
+              <label class="card-label">LANGUAGE</label>
+              <select
+                class="lang-select"
+                id="langSelect"
+                onchange="setLanguage(this.value)"
+              >
+                {% for lang in languages %}
+                <option value="{{ lang }}">{{ lang }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="action-grid">
+              <button class="action-btn" onclick="sendAction('confirm_word')">
+                <kbd>SPACE</kbd> Confirm Word
+              </button>
+              <button class="action-btn" onclick="sendAction('backspace')">
+                <kbd>⌫</kbd> Undo
+              </button>
+              <button class="action-btn speak" onclick="sendAction('generate')">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="currentColor"
+                >
+                  <path d="M2 5h3l4-3v10l-4-3H2z" />
+                  <path
+                    d="M10 4a4 4 0 010 6"
+                    stroke="currentColor"
+                    stroke-width="1.2"
+                    fill="none"
+                  />
+                </svg>
+                Speak Sentence
+              </button>
+            </div>
+          </div>
+
+          <!-- Model status -->
+          <div class="panel-card">
+            <div class="card-title">MODEL STATUS</div>
+            <div class="status-item">
+              <div class="status-icon ok">✓</div>
+              <div>
+                <div class="status-title">Letter Model Loaded</div>
+                <div class="status-sub">
+                  {{ letter_classes }} classes · 98-100% accuracy
+                </div>
+              </div>
+            </div>
+            <div class="status-item" id="wordStatus">
+              <div class="status-icon ok">✓</div>
+              <div>
+                <div class="status-title">Word Model Loaded</div>
+                <div class="status-sub">
+                  {{ word_classes }} classes · 100% accuracy
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent signs -->
+          <div class="panel-card">
+            <div class="card-title">RECENT SIGNS</div>
+            <div class="recent-list" id="recentList">
+              <span class="empty-hint">Signs will appear here</span>
+            </div>
+          </div>
+
+          <!-- How it works -->
+          <div class="panel-card how-card">
+            <div class="card-title">HOW IT WORKS</div>
+            <ol class="how-list">
+              <li>Start the camera above</li>
+              <li>
+                Switch to <strong>LETTER</strong> or <strong>WORD</strong> mode
+              </li>
+              <li>Sign — letters auto-add after a steady hold</li>
+              <li>Press <strong>Confirm Word</strong> or pick a suggestion</li>
+              <li>
+                Press <strong>Speak</strong> to translate & hear the sentence
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COLLECT DATA TAB ─────────────────────────────────── -->
+    <div class="tab-content" id="tab-collect">
+      <div class="collect-layout">
+        <div class="word-list-panel">
+          <div class="panel-header">SELECT SIGN TO RECORD</div>
+          <div id="wordGroups">
+            <div class="loading-hint">Loading word list...</div>
+          </div>
+        </div>
+        <div class="record-panel">
+          <div class="record-placeholder" id="recordPlaceholder">
+            <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+              <rect width="56" height="56" rx="16" fill="#1a1a2e" />
+              <path
+                d="M14 20h4l3-4h10l3 4h4a2 2 0 012 2v18a2 2 0 01-2 2H14a2 2 0 01-2-2V22a2 2 0 012-2z"
+                stroke="#444"
+                stroke-width="1.5"
+                fill="none"
+              />
+              <circle cx="28" cy="31" r="6" stroke="#444" stroke-width="1.5" />
+            </svg>
+            <p>Select a sign and start recording</p>
+            <p class="hint-sub">
+              Run <code>python src/collect_own_word_data.py</code> in terminal
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TRAIN MODEL TAB ──────────────────────────────────── -->
+    <div class="tab-content" id="tab-train">
+      <div class="train-layout">
+        <div class="train-stats-row">
+          <div class="stat-card">
+            <div class="stat-num" id="statLetters">{{ letter_classes }}</div>
+            <div class="stat-label">Letter Classes</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="statWords">{{ word_classes }}</div>
+            <div class="stat-label">Word Classes</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num green">100%</div>
+            <div class="stat-label">Word Accuracy</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num green">98-100%</div>
+            <div class="stat-label">Letter Accuracy</div>
+          </div>
+        </div>
+
+        <div class="train-panels">
+          <div class="train-card">
+            <div class="train-card-title">✋ Letter Model</div>
+            <div class="train-card-sub">Trained on your hand · A-Z + 0-9</div>
+            <div class="word-chips" id="letterChips">Loading...</div>
+            <button class="btn-train" onclick="runScript('letter')">
+              ↻ Retrain Letter Model
+            </button>
+            <div class="train-note">
+              Run in terminal: <code>python src/train_own_letter_model.py</code>
+            </div>
+          </div>
+
+          <div class="train-card">
+            <div class="train-card-title">🤟 Word Model</div>
+            <div class="train-card-sub">Trained on your hand · ISL words</div>
+            <div class="word-chips" id="wordChips">Loading...</div>
+            <button class="btn-train" onclick="runScript('word')">
+              ↻ Retrain Word Model
+            </button>
+            <div class="train-note">
+              Run in terminal: <code>python src/train_own_word_model.py</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+  </body>
+</html>
