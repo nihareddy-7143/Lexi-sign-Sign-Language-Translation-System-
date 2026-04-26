@@ -56,6 +56,9 @@
         <button class="tab" data-tab="train">
           <span class="tab-dot green"></span> Train Model
         </button>
+        <button class="tab" data-tab="tutor">
+          <span class="tab-dot purple"></span> Tutor
+        </button>
       </div>
 
       <div class="model-badge" id="modelBadge">
@@ -290,6 +293,24 @@
       </div>
     </div>
 
+    <!-- ── TUTOR TAB ──────────────────────────────────── -->
+<!-- ── TUTOR TAB ──────────────────────────────────── -->
+<div class="tab-content" id="tab-tutor">
+  <div class="animated-bg"></div>
+
+  <!-- Header -->
+  <div class="game-header">
+    <h1>ISL Learning Adventure 🎮</h1>
+    <button class="btn-primary" onclick="startGame()">Start</button>
+    
+  </div>
+
+  <!-- Map -->
+  <div id="gameMap" class="game-map" style="display:flex;"></div>
+<div id="gamePlay" class="game-play" style="display:none;"></div>
+
+</div>
+
     <!-- ── COLLECT DATA TAB ─────────────────────────────────── -->
     <div class="tab-content" id="tab-collect">
       <div class="collect-layout">
@@ -371,5 +392,6 @@
     </div>
 
     <script src="/static/js/app.js"></script>
+    <script src="/static/js/tutor.js"></script>
   </body>
 </html>

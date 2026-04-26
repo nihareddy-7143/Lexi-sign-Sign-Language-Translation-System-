@@ -245,12 +245,23 @@ def generate_frames():
         time.sleep(0.033)
 
 # ── Routes ────────────────────────────────────────────────────────────────────
+
 @app.route('/')
+def landing():
+    return render_template('landing.html')
+
+@app.route('/bidirectional')
+def isl_translate_v7():
+    return render_template('isl_translator_v7.html')
+
+
+@app.route('/translate')
 def index():
     return render_template('index.html',
                            languages=LANGUAGES,
                            letter_classes=len(le_letters.classes_) if le_letters else 0,
                            word_classes=len(le_words.classes_)   if le_words   else 0)
+
 
 @app.route('/video_feed')
 def video_feed():
@@ -384,6 +395,37 @@ def model_stats():
         "letter_words":   list(le_letters.classes_) if le_letters else [],
         "word_words":     list(le_words.classes_)   if le_words   else [],
     })
+
+# ── Tutor Lessons API ───────────────────────────────────────
+
+# ── Tutor Lessons API ───────────────────────────────────────
+
+ALPHABETS = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+NUMBERS   = list(map(str, range(1,10)))
+WORDS = ["I_Love_You", "my_name", "No", "Thank_you", "water", "yes"]
+
+@app.route('/api/tutor/lesson/<lesson_type>')
+def tutor_lesson(lesson_type):
+
+    if lesson_type == "alphabets":
+        return jsonify({
+            "type": "alphabets",
+            "items": ALPHABETS
+        })
+
+    elif lesson_type == "numbers":
+        return jsonify({
+            "type": "numbers",
+            "items": NUMBERS
+        })
+
+    elif lesson_type == "words":
+        return jsonify({
+            "type": "words",
+            "items": WORDS
+        })
+
+    return jsonify({"error": "Invalid lesson"}), 400
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000, threaded=True)

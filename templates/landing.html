@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>LexiSign — Bridging silence with intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07060c;
+    --bg-2:#0b0a14;
+    --panel:rgba(20,16,38,0.55);
+    --panel-border:rgba(255,255,255,0.08);
+    --text:#e9e7f3;
+    --muted:#9a93b3;
+    --cyan:#5ee0ff;
+    --violet:#a47bff;
+    --pink:#ff7ad9;
+    --magenta:#ff4fa3;
+    --grad: linear-gradient(90deg,#5ee0ff 0%,#9a7bff 50%,#ff7ad9 100%);
+    --grad-btn: linear-gradient(90deg,#5ee0ff,#a47bff,#ff7ad9);
+    --grad-icon-cyan: linear-gradient(135deg,#5ee0ff,#7a8cff);
+    --grad-icon-violet: linear-gradient(135deg,#a866ff,#ff5fbf);
+    --grad-icon-pink: linear-gradient(135deg,#ff5fbf,#ff7a9c);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Space Grotesk',system-ui,sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(900px 600px at 85% 5%, rgba(94,224,255,0.10), transparent 60%),
+      radial-gradient(800px 700px at 10% 40%, rgba(255,79,163,0.10), transparent 60%),
+      radial-gradient(900px 700px at 90% 70%, rgba(94,224,255,0.07), transparent 60%),
+      linear-gradient(180deg,#07060c,#0a0814 60%,#07060c);
+    background-attachment: fixed;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    pointer-events:none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size:46px 46px;
+    mask-image: radial-gradient(ellipse at center, #000 40%, transparent 85%);
+    z-index:0;
+  }
+  .wrap{max-width:1320px;margin:0 auto;padding:0 32px;position:relative;z-index:1}
+  .mono{font-family:'JetBrains Mono',monospace;letter-spacing:.08em}
+  .grad-text{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  /* NAV */
+  nav{
+    position:sticky; top:18px; z-index:50;
+    margin:18px auto 0; max-width:1320px; padding:0 32px;
+  }
+  .nav-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 22px;
+    background:rgba(14,12,28,0.65);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:18px;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+  }
+  .brand{display:flex;align-items:center;gap:12px;font-weight:700;font-size:20px}
+  .brand-mark{
+    width:38px;height:38px;border-radius:11px;
+    background:var(--grad-icon-cyan);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 24px rgba(94,224,255,0.35);
+    font-size:18px;
+  }
+  .brand-mark svg{width:20px;height:20px;color:#0b0a14}
+  .brand .sign{color:var(--cyan)}
+  .nav-links{display:flex;gap:36px}
+  .nav-links a{color:var(--muted);text-decoration:none;font-size:15px}
+  .nav-links a:hover{color:var(--text)}
+  .btn{
+    border:0;cursor:pointer;font-family:inherit;font-weight:600;
+    padding:11px 22px;border-radius:12px;color:#0b0814;
+    background:var(--grad-btn);
+    box-shadow:0 8px 28px rgba(168,123,255,0.45), 0 0 0 1px rgba(255,255,255,0.15) inset;
+    text-decoration:none;display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn.ghost{
+    background:rgba(255,255,255,0.04);
+    color:var(--text);
+    box-shadow:0 0 0 1px rgba(255,255,255,0.08) inset;
+  }
+
+  /* HERO */
+  .hero{padding:72px 0 40px;display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center}
+  .pill{
+    display:inline-flex;align-items:center;gap:10px;
+    padding:8px 14px;border-radius:999px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    font-size:12px;color:#cfc8e6;
+  }
+  .pill .dot{width:14px;height:14px;border-radius:4px;background:var(--grad-icon-cyan)}
+  h1.hero-title{
+    font-size:clamp(44px,6vw,84px);line-height:1.02;letter-spacing:-0.02em;
+    margin:22px 0 22px;font-weight:700;
+  }
+  .lede{color:#b9b3cf;font-size:17px;line-height:1.65;max-width:560px}
+  .lede b{color:#fff;font-weight:600}
+  .cta-row{display:flex;gap:14px;margin-top:34px}
+
+  .stats{display:flex;gap:60px;margin-top:54px}
+  .stat .num{font-size:34px;font-weight:700;color:var(--cyan)}
+  .stat .num.v{color:var(--violet)}
+  .stat .num.p{color:var(--pink)}
+  .stat .lbl{color:var(--muted);font-size:13px;margin-top:2px}
+
+  /* HERO VISUAL */
+  .visual{
+    position:relative;border-radius:22px;overflow:hidden;
+    border:1px solid rgba(255,255,255,0.08);
+    background:linear-gradient(180deg,#0d0a1c,#07060f);
+    aspect-ratio: 16/11;
+    box-shadow:0 30px 80px rgba(0,0,0,0.5);
+  }
+  .visual::before{
+    content:"";position:absolute;inset:0;
+    background:
+      radial-gradient(60% 70% at 30% 60%, rgba(94,224,255,0.25), transparent 60%),
+      radial-gradient(50% 60% at 75% 50%, rgba(255,79,163,0.30), transparent 60%);
+  }
+  .v-tag{
+    position:absolute;top:18px;left:18px;z-index:2;
+    font-family:'JetBrains Mono',monospace;font-size:12px;color:#cfeaff;
+    background:rgba(0,0,0,0.45);padding:6px 12px;border-radius:8px;
+    border:1px solid rgba(94,224,255,0.3);
+  }
+  .v-tag::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--cyan);margin-right:8px;box-shadow:0 0 10px var(--cyan)}
+  .v-trans{
+    position:absolute;right:18px;bottom:18px;z-index:2;
+    background:rgba(0,0,0,0.55);padding:10px 14px;border-radius:10px;
+    border:1px solid rgba(255,255,255,0.1);max-width:240px;
+  }
+  .v-trans .t1{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--cyan)}
+  .v-trans .t2{margin-top:4px;font-size:14px;color:#fff}
+  .hand{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:200px;filter: drop-shadow(0 0 30px rgba(94,224,255,0.5));
+  }
+  .hand svg{width:65%;height:65%;color:#bff0ff;opacity:.9}
+  .waves{
+    position:absolute; right:-10%; top:35%; width:75%; height:35%;
+    background:
+      repeating-linear-gradient(transparent 0 6px, rgba(255,79,163,0.55) 6px 7px);
+    mask-image: radial-gradient(ellipse at left, #000, transparent 70%);
+    filter: blur(0.4px);
+    transform: skewY(-3deg);
+  }
+
+  /* SECTION TITLES */
+  section{padding:120px 0;position:relative;z-index:1}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan);letter-spacing:.18em}
+  .eyebrow.pink{color:var(--magenta)}
+  .eyebrow.violet{color:var(--violet)}
+  h2{font-size:clamp(34px,4.4vw,56px);line-height:1.05;letter-spacing:-0.02em;margin:14px 0 20px;font-weight:700;max-width:900px}
+  .sec-lede{color:var(--muted);max-width:680px;font-size:16px;line-height:1.6}
+
+  /* PILLAR CARDS */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:64px}
+  .card{
+    position:relative;
+    background:linear-gradient(180deg,rgba(20,16,38,0.7),rgba(12,10,24,0.6));
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:18px;padding:28px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.35);
+  }
+  .card .top{display:flex;justify-content:space-between;align-items:flex-start}
+  .icon-box{
+    width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    color:#0b0814;
+  }
+  .icon-box svg{width:26px;height:26px}
+  .ic-1{background:var(--grad-icon-cyan)}
+  .ic-2{background:var(--grad-icon-violet)}
+  .ic-3{background:var(--grad-icon-pink)}
+  .modnum{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+  .card h3{font-size:22px;margin:28px 0 14px;font-weight:700}
+  .card p{color:var(--muted);font-size:14.5px;line-height:1.65;margin:0}
+  .divider{height:1px;background:rgba(255,255,255,0.06);margin:22px 0}
+  .feat{display:flex;align-items:center;gap:12px;color:#cfc8e6;font-size:14px;padding:6px 0}
+  .feat svg{width:16px;height:16px;color:var(--cyan)}
+  .feat:nth-child(2) svg{color:var(--violet)}
+  .feat:nth-child(3) svg{color:var(--pink)}
+
+  /* PIPELINE */
+  .pipeline{margin-top:80px;display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+  .pipeline::before{
+    content:"";position:absolute;left:12%;right:12%;top:46px;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(94,224,255,0.4),rgba(255,79,163,0.4),transparent);
+    z-index:0;
+  }
+  .step{display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 16px;position:relative;z-index:1}
+  .step .icn{
+    width:72px;height:72px;border-radius:16px;background:rgba(10,8,22,0.9);
+    border:1px solid rgba(94,224,255,0.35);
+    display:flex;align-items:center;justify-content:center;color:var(--cyan);
+    box-shadow:0 0 30px rgba(94,224,255,0.18);position:relative;
+  }
+  .step .icn svg{width:30px;height:30px}
+  .badge{
+    position:absolute;top:-8px;right:-8px;width:26px;height:26px;border-radius:50%;
+    background:var(--grad-icon-cyan);color:#0b0814;font-size:12px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .step h4{margin:22px 0 10px;font-size:18px}
+  .step p{color:var(--muted);font-size:13.5px;line-height:1.6;max-width:240px;margin:0}
+
+  /* TEAM */
+  .team{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:64px}
+  .member{
+    border:1px solid rgba(255,255,255,0.08);border-radius:18px;padding:34px;text-align:center;
+    background:linear-gradient(180deg,rgba(20,16,38,0.55),rgba(12,10,24,0.45));
+  }
+  .avatar{
+    width:120px;height:120px;border-radius:50%;margin:0 auto 22px;
+    padding:3px;background:var(--grad-btn);
+  }
+  .avatar > div{
+    width:100%;height:100%;border-radius:50%;
+    background:#1a1430 center/cover no-repeat;
+    display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:32px;
+  }
+  .avatar > div{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  background:#1a1430 center/cover no-repeat;
+}
+  .member h4{margin:0 0 6px;font-size:17px}
+  .member p{margin:0;color:var(--muted);font-size:13px}
+  .member.active{border-color:rgba(94,224,255,0.45);box-shadow:0 0 0 1px rgba(94,224,255,0.2), 0 20px 60px rgba(94,224,255,0.08)}
+
+  /* CTA */
+  .cta-card{
+    margin:40px 0;
+    border-radius:24px;padding:90px 32px;text-align:center;
+    background:
+      radial-gradient(60% 80% at 50% 0%, rgba(94,224,255,0.18), transparent 60%),
+      radial-gradient(60% 80% at 50% 100%, rgba(255,79,163,0.18), transparent 60%),
+      linear-gradient(180deg,#1a1538,#120e26);
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:0 30px 80px rgba(0,0,0,0.5);
+  }
+  .cta-card h2{margin:0 auto 18px;max-width:900px}
+  .cta-card .sec-lede{margin:0 auto 34px}
+  .cta-row.center{justify-content:center}
+
+  /* FOOTER */
+  footer{padding:40px 0 60px;display:flex;justify-content:space-between;color:var(--muted);font-size:13px}
+  footer .right{font-family:'JetBrains Mono',monospace}
+
+  @media (max-width:960px){
+    .hero{grid-template-columns:1fr;padding-top:40px}
+    .cards,.team{grid-template-columns:1fr}
+    .pipeline{grid-template-columns:repeat(2,1fr);row-gap:48px}
+    .pipeline::before{display:none}
+    .nav-links{display:none}
+    .stats{flex-wrap:wrap;gap:30px}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6a1.5 1.5 0 0 1 3 0v5"/><path d="M12 11V4.5a1.5 1.5 0 0 1 3 0V11"/><path d="M15 11V6a1.5 1.5 0 0 1 3 0v8a7 7 0 0 1-7 7h-1a6 6 0 0 1-6-6v-1l-1.5-3a1.4 1.4 0 0 1 2.4-1.4L6 12"/></svg>
+      </div>
+      Lexi<span class="sign">Sign</span>
+    </div>
+    <div class="nav-links">
+      <a href="#">Home</a><a href="/translate ">Recognize</a><a href=" /bidirectional">Translate</a>
+    </div>
+    <a href="/translate" class="btn">Try Demo</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- HERO -->
+<section class="hero" style="padding-top:72px">
+  <div>
+    <span class="pill"><span class="dot"></span><span class="mono">LEXISIGN · 2026</span></span>
+    <h1 class="hero-title">Bridging silence<br/>with <span class="grad-text">intelligence.</span></h1>
+    <p class="lede"><b>LexiSign</b> is a bidirectional sign language translator powered by computer vision, NLP and a real-time avatar — with a gamified experience to learn signs across 10 Indian languages.</p>
+    <div class="cta-row">
+      <a class="btn" href="#">Explore Features →</a>
+      <a class="btn ghost" href="#">How it works</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="num">10+</div><div class="lbl">Indian Languages</div></div>
+      <div class="stat"><div class="num">Real-time</div><div class="lbl">Avatar Sync</div></div>
+      <div class="stat"><div class="num">Adaptive</div><div class="lbl">Learning Levels</div></div>
+    </div>
+  </div>
+
+  <div class="visual">
+    <div class="v-tag">LIVE · 98.2% confidence</div>
+    <div class="hand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 11V6a1.5 1.5 0 0 1 3 0v5"/><path d="M12 11V4.5a1.5 1.5 0 0 1 3 0V11"/>
+        <path d="M15 11V6a1.5 1.5 0 0 1 3 0v8a7 7 0 0 1-7 7h-1a6 6 0 0 1-6-6v-1l-1.5-3a1.4 1.4 0 0 1 2.4-1.4L6 12"/>
+      </svg>
+    </div>
+    <div class="waves"></div>
+    <div class="v-trans">
+      <div class="t1">→ TRANSLATION</div>
+      <div class="t2">"Hello, how are you?"</div>
+    </div>
+  </div>
+</section>
+
+<!-- THREE PILLARS -->
+<section>
+  <div class="eyebrow">// THREE PILLARS</div>
+  <h2>One platform. <span class="grad-text">Infinite conversations.</span></h2>
+  <p class="sec-lede">LexiSign is built around three tightly integrated modules — each solving a critical piece of the sign-language accessibility puzzle.</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="top">
+        <div class="icon-box ic-1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+        <div class="modnum">Module 01</div>
+      </div>
+      <h3>Sign → Text &amp; Voice</h3>
+      <p>A custom-trained ML model recognizes sign language gestures in real time. NLP stitches them into meaningful sentences, then translates to any of 10 Indian languages and speaks them aloud.</p>
+      <div class="divider"></div>
+      <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>Real-time gesture recognition</div>
+      <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8h6M8 5v6M14 19l-2-5 7-2-5 7z"/></svg>10+ Indian language output</div>
+      <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>Natural text-to-speech voice</div>
+    </div>
+
+    <div class="card">
+      <div class="top">
+        <div class="icon-box ic-2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="modnum">Module 02</div>
+      </div>
+      <h3>Text / Voice → Avatar Signs</h3>
+      <p>Type or speak in English or any Indian language. A 3D avatar instantly performs the corresponding sign language — closing the communication loop both ways.</p>
+      <div class="divider"></div>
+      <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Multilingual text &amp; voice input</div>
+      <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8h6M8 5v6M14 19l-2-5 7-2-5 7z"/></svg>Realistic 3D avatar rendering</div>
+      <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8h14M5 16h14M9 4l-2 16M17 4l-2 16"/></svg>Cross-language sign synthesis</div>
+    </div>
+
+    <div class="card">
+      <div class="top">
+        <div class="icon-box ic-3">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M7 12h4M9 10v4M15 11v.01M18 13v.01"/></svg>
+        </div>
+        <div class="modnum">Module 03</div>
+      </div>
+      <h3>Gamified Learning</h3>
+      <p>Learn alphabets, numbers, words and phrases through level-based challenges. An adaptive engine personalizes difficulty so every learner progresses at their own pace.</p>
+      <div class="divider"></div>
+      <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="2"/></svg>Level-based skill progression</div>
+      <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8h6M8 5v6M14 19l-2-5 7-2-5 7z"/></svg>Adaptive difficulty engine</div>
+      <div class="feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>Live gesture validation</div>
+    </div>
+  </div>
+</section>
+
+<!-- PIPELINE -->
+<section style="text-align:center">
+  <div class="eyebrow violet">// PIPELINE</div>
+  <h2 style="margin-left:auto;margin-right:auto">From gesture to <span class="grad-text">grammar</span>, in milliseconds.</h2>
+
+  <div class="pipeline">
+    <div class="step">
+      <div class="icn"><span class="badge">1</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      </div>
+      <h4>Capture</h4><p>Webcam streams hand &amp; body keypoints in real time using MediaPipe + custom CNN.</p>
+    </div>
+    <div class="step">
+      <div class="icn"><span class="badge">2</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 3a3 3 0 0 0-3 3v.5A3 3 0 0 0 4 9.5V12a3 3 0 0 0 1 5v1a3 3 0 0 0 4.5 2.6V3z"/><path d="M14.5 3a3 3 0 0 1 3 3v.5A3 3 0 0 1 20 9.5V12a3 3 0 0 1-1 5v1a3 3 0 0 1-4.5 2.6V3z"/></svg>
+      </div>
+      <h4>Recognize</h4><p>Our trained ML model classifies gestures and feeds them to an NLP sentence builder.</p>
+    </div>
+    <div class="step">
+      <div class="icn"><span class="badge">3</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h6M8 5v6M14 19l-2-5 7-2-5 7z"/></svg>
+      </div>
+      <h4>Translate</h4><p>Sentences are translated to any of 10 Indian languages with context-aware grammar.</p>
+    </div>
+    <div class="step">
+      <div class="icn"><span class="badge">4</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg>
+      </div>
+      <h4>Speak / Sign</h4><p>Output as natural voice — or rendered back into sign by our 3D avatar engine.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow pink">// THE MINDS BEHIND IT</div>
+  <h2>Built by a team that <span class="grad-text">cares.</span></h2>
+
+  <div class="team"> <!-- THIS WAS MISSING -->
+
+    <div class="member">
+      <div class="avatar">
+        <div style="background-image: url('/static/images/member1.jpg');"></div>
+      </div>
+      <h4>Team Member 01</h4>
+      <p>ML & Computer Vision</p>
+    </div>
+
+    <div class="member">
+      <div class="avatar">
+        <div style="background-image: url('/static/images/member2.jpg');"></div>
+      </div>
+      <h4>Team Member 02</h4>
+      <p>NLP & Translation</p>
+    </div>
+
+    <div class="member active">
+      <div class="avatar">
+        <div style="background-image: url('/static/images/member3.jpg');"></div>
+      </div>
+      <h4>Team Member 03</h4>
+      <p>Avatar & Frontend</p>
+    </div>
+
+  </div>
+</section>
+<!-- CTA -->
+<section style="padding:40px 0">
+  <div class="cta-card">
+    <h2>Ready to see <span class="grad-text">LexiSign</span> in action?</h2>
+    <p class="sec-lede">Experience real-time bidirectional sign language translation built for accessibility.</p>
+    <div class="cta-row center">
+      <a class="btn" href="/translate">Launch Demo →</a>
+      <a class="btn ghost" href="#">Read Docs</a>
+    </div>
+  </div>
+
+  <footer>
+    <div>© 2026 LexiSign</div>
+    <div class="right">Built with computer vision · NLP · 3D avatars</div>
+  </footer>
+</section>
+
+</div>
+</body>
+</html>

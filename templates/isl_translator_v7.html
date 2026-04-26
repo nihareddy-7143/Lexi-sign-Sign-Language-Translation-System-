@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LexiSign — Indian Sign Language</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080b14;--bg2:#0c1020;--bg3:#0f1526;--card:#101828;
+  --border:#1a2236;--border2:#1e2a40;
+  --accent:#8B5CF6;--accent2:#22d3ee;
+  --grad-start:#22d3ee;--grad-end:#8B5CF6;
+  --green:#00FFB2;--red:#FF4D6A;--pink:#FF3D9A;
+  --text:#e2e8f0;--text2:#7a90b0;--text3:#445570;
+  --mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;
+  --display:'Syne',sans-serif;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;border-bottom:1px solid var(--border);flex-shrink:0;z-index:10;background:rgba(8,11,20,0.95);backdrop-filter:blur(12px);}
+.logo{font-family:var(--display);font-weight:800;font-size:19px;letter-spacing:-0.5px;display:flex;align-items:center;gap:10px;}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--grad-start),var(--grad-end));display:flex;align-items:center;justify-content:center;font-size:16px;}
+.logo-text{color:var(--text);}
+.logo-text span{background:linear-gradient(90deg,var(--grad-start),var(--grad-end));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nav-pills{display:flex;gap:4px;}
+.pill{font-size:11px;font-weight:500;padding:5px 14px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--sans);transition:all .15s;}
+.pill:hover{background:var(--bg3);color:var(--text);}
+.pill.active{background:rgba(139,92,246,0.15);color:var(--accent);border-color:rgba(139,92,246,0.4);}
+.badge{font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;background:rgba(34,211,238,0.1);color:var(--accent2);border:1px solid rgba(34,211,238,0.25);}
+.main{display:grid;grid-template-columns:1fr 1fr;flex:1;overflow:hidden;}
+/* LEFT */
+.lpanel{display:flex;flex-direction:column;border-right:1px solid var(--border);background:var(--card);}
+.ph{padding:13px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.pl{font-family:var(--display);font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--text3);}
+.langbar{padding:11px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;}
+.langbar::-webkit-scrollbar{display:none;}
+.lchip{flex-shrink:0;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--sans);transition:all .15s;white-space:nowrap;}
+.lchip:hover{background:var(--bg3);color:var(--text);}
+.lchip.active{background:rgba(34,211,238,0.1);color:var(--accent2);border-color:rgba(34,211,238,0.35);}
+.lsep{width:1px;height:14px;background:var(--border2);flex-shrink:0;}
+.iarea{flex:1;display:flex;flex-direction:column;padding:14px 20px;gap:9px;overflow:hidden;min-height:0;}
+textarea{flex:1;font-family:var(--sans);font-size:14px;font-weight:300;line-height:1.8;color:var(--text);background:transparent;border:none;outline:none;resize:none;width:100%;min-height:70px;}
+textarea::placeholder{color:var(--text3);}
+.qphrases{display:flex;gap:5px;flex-wrap:wrap;max-height:72px;overflow-y:auto;scrollbar-width:none;flex-shrink:0;}
+.qphrases::-webkit-scrollbar{display:none;}
+.qbtn{font-size:10px;padding:3px 9px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--sans);transition:all .15s;white-space:nowrap;}
+.qbtn:hover{background:rgba(139,92,246,0.1);color:var(--accent);border-color:rgba(139,92,246,0.3);}
+.ifooter{display:flex;align-items:center;justify-content:space-between;padding-top:9px;border-top:1px solid var(--border);flex-shrink:0;}
+.charcount{font-size:11px;color:var(--text3);}
+.arow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.bclear{font-family:var(--sans);font-size:11px;font-weight:500;padding:6px 11px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;}
+.bclear:hover{background:var(--bg3);color:var(--text);}
+@keyframes pring{0%{transform:scale(.8);opacity:1}100%{transform:scale(2.2);opacity:0}}
+.bvoice{display:flex;align-items:center;gap:5px;font-family:var(--sans);font-size:12px;font-weight:500;padding:6px 13px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;}
+.bvoice.listening{background:rgba(34,211,238,0.1);border-color:rgba(34,211,238,0.4);color:var(--accent2);}
+.mdot{width:8px;height:8px;border-radius:50%;border:2px solid currentColor;flex-shrink:0;}
+.mpulse{display:none;position:relative;width:8px;height:8px;border-radius:50%;background:var(--accent2);flex-shrink:0;}
+.mpulse::before{content:'';position:absolute;inset:-4px;border-radius:50%;background:var(--accent2);animation:pring 1.2s ease-out infinite;}
+.listening .mpulse{display:block;}
+.listening .mdot{display:none;}
+.btrans{font-family:var(--display);font-size:12px;font-weight:700;padding:6px 18px;border-radius:6px;border:none;background:linear-gradient(90deg,var(--grad-start),var(--grad-end));color:#fff;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.btrans::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,var(--grad-end),var(--grad-start));opacity:0;transition:opacity .3s;}
+.btrans:hover::before{opacity:1;}
+.btrans:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(139,92,246,0.4);}
+.btrans:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.gloss{padding:10px 20px;border-top:1px solid var(--border);background:var(--bg3);min-height:48px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex-shrink:0;}
+.glabel{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-right:3px;flex-shrink:0;}
+.gtok{font-family:var(--display);font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:var(--card);border:1px solid var(--border2);color:var(--text2);animation:tin .2s ease forwards;transform:translateY(4px);opacity:0;transition:background .2s,color .2s,border-color .2s;}
+.gtok.fi{background:rgba(34,211,238,0.08);border-color:rgba(34,211,238,0.25);color:var(--accent2);}
+.gtok.vid{background:rgba(0, 255, 178, 0.08);border-color:rgba(0, 255, 178, 0.3);color:var(--green);}
+.gtok.active{background:linear-gradient(90deg,var(--grad-start),var(--grad-end))!important;color:#fff!important;border-color:transparent!important;}
+/* RIGHT */
+.rpanel{display:flex;flex-direction:column;background:var(--bg3);overflow:hidden;}
+/* ── VIEW MODE TOGGLE BAR ── */
+.viewbar{padding:8px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.vmode-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-right:4px;}
+.vmode-btn{font-size:11px;font-weight:500;padding:4px 11px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:var(--sans);transition:all .15s;}
+.vmode-btn:hover{background:var(--bg3);color:var(--text);}
+.vmode-btn.active{background:rgba(139,92,246,0.15);color:var(--accent);border-color:rgba(139,92,246,0.4);}
+.vmode-both .vmode-btn.active{background:linear-gradient(90deg,var(--grad-start),var(--grad-end));color:#fff;border-color:transparent;}
+.vmode-info{margin-left:auto;font-size:10px;color:var(--text3);}
+/* ── STAGE ── */
+.stage-wrap{flex:1;overflow:hidden;display:flex;flex-direction:row;gap:0;position:relative;}
+/* single mode */
+.stage{flex:1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.stage::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(34,211,238,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.012) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;}
+/* split mode: two halves */
+.stage-left,.stage-right{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.stage-left{flex:1;border-right:1px solid var(--border);}
+.stage-right{flex:1;}
+.stage-left::before,.stage-right::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(34,211,238,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.012) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;}
+.half-label{position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px;border-radius:20px;background:var(--card);border:1px solid var(--border2);color:var(--text3);z-index:10;pointer-events:none;font-family:var(--display);}
+
+/* video elements */
+#islVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:4;display:none;background:var(--bg3);}
+#islVideoSplit{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:4;display:none;background:var(--bg3);}
+#vidBadge{position:absolute;bottom:60px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none;z-index:6;}
+.vtag{font-size:9px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;padding:3px 8px;border-radius:20px;background:rgba(139,92,246,0.18);border:1px solid rgba(139,92,246,0.4);color:var(--accent);font-family:var(--display);}
+.no-vid-msg{position:absolute;bottom:60px;left:0;right:0;display:flex;align-items:center;justify-content:center;z-index:6;pointer-events:none;}
+.no-vid-tag{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:3px 9px;border-radius:20px;background:rgba(68,85,112,0.18);border:1px solid rgba(68,85,112,0.3);color:var(--text3);font-family:var(--display);}
+
+/* translation loading indicator */
+#transStatus{font-size:10px;color:var(--accent2);padding:2px 8px;border-radius:4px;background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.2);display:none;}
+.gorb{position:absolute;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,0.05) 0%,rgba(34,211,238,0.03) 40%,transparent 70%);pointer-events:none;}
+.sbadge{position:absolute;top:12px;right:12px;font-family:var(--display);font-size:9px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;padding:4px 9px;border-radius:20px;background:var(--card);border:1px solid var(--border2);color:var(--text3);transition:all .3s;z-index:5;}
+.sbadge.on{background:rgba(139,92,246,0.12);border-color:rgba(139,92,246,0.35);color:var(--accent);}
+.scnt{font-size:9px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;padding:4px 9px;border-radius:4px;background:transparent;border:none;color:var(--text3);font-family:var(--display);}
+.csign{position:absolute;bottom:50px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none;z-index:5;}
+@keyframes spop{0%{transform:scale(.85);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+.sword{font-family:var(--display);font-size:18px;font-weight:800;background:linear-gradient(90deg,var(--grad-start),var(--grad-end));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.5px;opacity:0;}
+.sword.vis{opacity:1;animation:spop .3s ease forwards;}
+.ssub{font-size:10px;color:var(--text3);text-align:center;max-width:200px;}
+.pbar{padding:0 20px 7px;flex-shrink:0;}
+.ptrack{height:2px;background:var(--card);border-radius:2px;overflow:hidden;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--grad-start),var(--grad-end));border-radius:2px;width:0%;transition:width .4s ease;}
+.cbar{padding:8px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);flex-shrink:0;}
+.spd{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);font-weight:500;}
+.spdBtn{font-family:var(--sans);font-size:10px;font-weight:500;padding:3px 7px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;}
+.spdBtn.active{background:rgba(139,92,246,0.1);color:var(--accent);border-color:rgba(139,92,246,0.35);}
+.repBtn{font-family:var(--sans);font-size:10px;font-weight:500;padding:3px 9px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;}
+.repBtn.on{background:rgba(34,211,238,0.1);border-color:rgba(34,211,238,0.35);color:var(--accent2);}
+/* Detected language badge */
+#detectedLang{font-size:10px;color:var(--accent2);padding:2px 7px;border-radius:20px;background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);display:none;}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo"><div class="logo-icon">🤟</div><div class="logo-text">Lexi<span>Sign</span></div></div>
+  <div class="nav-pills">
+    <button class="pill active">Translate</button>
+    <button class="pill">Learn</button>
+    <button class="pill">Dictionary</button>
+  </div>
+  <div class="badge">Indian Sign Language</div>
+</nav>
+<div class="main">
+  <!-- LEFT PANEL -->
+  <div class="lpanel">
+    <div class="ph">
+      <span class="pl">Input Text / Voice</span>
+      <span id="detectedLang"></span>
+    </div>
+    <div class="langbar">
+      <button class="lchip active" onclick="selLang(this,'auto')">Auto Detect</button>
+      <div class="lsep"></div>
+      <button class="lchip" onclick="selLang(this,'en')">English</button>
+      <div class="lsep"></div>
+      <button class="lchip" onclick="selLang(this,'hi')">हिन्दी</button>
+      <button class="lchip" onclick="selLang(this,'te')">తెలుగు</button>
+      <button class="lchip" onclick="selLang(this,'ta')">தமிழ்</button>
+      <button class="lchip" onclick="selLang(this,'ml')">മലയാളം</button>
+      <button class="lchip" onclick="selLang(this,'kn')">ಕನ್ನಡ</button>
+      <button class="lchip" onclick="selLang(this,'bn')">বাংলা</button>
+      <button class="lchip" onclick="selLang(this,'mr')">मराठी</button>
+      <button class="lchip" onclick="selLang(this,'gu')">ગુજરાતી</button>
+      <button class="lchip" onclick="selLang(this,'pa')">ਪੰਜਾਬੀ</button>
+      <button class="lchip" onclick="selLang(this,'ur')">اردو</button>
+      <button class="lchip" onclick="selLang(this,'or')">ଓଡ଼ିଆ</button>
+    </div>
+    <div class="iarea">
+      <textarea id="tin" placeholder="Type or speak in any Indian language or English…" oninput="updChar()" maxlength="500"></textarea>
+      <div class="qphrases" id="qph"></div>
+      <div class="ifooter">
+        <span class="charcount" id="cc">0 / 500</span>
+        <div class="arow">
+          <button class="bclear" onclick="clearAll()">Clear</button>
+          <span id="transStatus">Translating…</span>
+          <button class="bvoice" id="vbtn" onclick="toggleVoice()">
+            <div class="mdot"></div><div class="mpulse"></div>
+            <span id="vlbl">Voice</span>
+          </button>
+          <button class="btrans" id="translateBtn" onclick="translate()">Translate →</button>
+        </div>
+      </div>
+    </div>
+    <div class="gloss" id="glossEl">
+      <span class="glabel">ISL Gloss</span>
+      <span style="font-size:11px;color:var(--muted);font-style:italic">will appear after translation</span>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="rpanel">
+    <!-- VIEW MODE BAR -->
+    <div class="viewbar" id="viewbar">
+      <span class="vmode-label">View</span>
+      <button class="vmode-btn active" id="vm-avatar" onclick="setViewMode('avatar')">Avatar</button>
+      <button class="vmode-btn" id="vm-video" onclick="setViewMode('video')">Video</button>
+      <button class="vmode-btn" id="vm-both" onclick="setViewMode('both')">Side-by-Side</button>
+      <span class="vmode-info" id="vmInfo">Avatar signs all words • Video plays when available</span>
+    </div>
+    <div class="ph" style="padding:8px 20px;">
+      <span class="pl">ISL Avatar</span>
+      <span id="scnt" class="scnt">— signs</span>
+    </div>
+
+    <!-- STAGE WRAP: switches between single and split layout -->
+    <div class="stage-wrap" id="stageWrap">
+      <!-- SINGLE MODE (avatar or video alone) -->
+      <div class="stage" id="stageSingle" style="display:flex;">
+        <div class="gorb"></div>
+        <div class="sbadge" id="sbadge">Waiting for input</div>
+        <video id="islVideo" playsinline></video>
+        <canvas id="cv"></canvas>
+        <div id="vidBadge" style="display:none"><span class="vtag">▶ ISLRTC Video</span></div>
+        <div class="no-vid-msg" id="noVidMsg" style="display:none"><span class="no-vid-tag">⚠ No video available — showing avatar</span></div>
+        <div class="csign">
+          <div class="sword" id="sw"></div>
+          <div class="ssub" id="ss"></div>
+        </div>
+      </div>
+
+      <!-- SPLIT MODE (both side by side) -->
+      <div class="stage-left" id="stageLeft" style="display:none;">
+        <div class="gorb"></div>
+        <span class="half-label">Video Sign</span>
+        <video id="islVideoSplit" playsinline></video>
+        <div id="noVidMsgSplit" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column;gap:8px;">
+          <span style="font-size:28px;">📹</span>
+          <span style="font-size:11px;color:var(--muted);text-align:center;padding:0 20px;">No video available for this sign</span>
+        </div>
+        <div id="vidBadgeSplit" style="display:none;position:absolute;bottom:30px;left:0;right:0;display:flex;justify-content:center;pointer-events:none;z-index:6;"><span class="vtag">▶ Playing</span></div>
+      </div>
+      <div class="stage-right" id="stageRight" style="display:none;">
+        <div class="gorb"></div>
+        <span class="half-label">Avatar</span>
+        <canvas id="cvSplit"></canvas>
+        <div class="csign" style="bottom:30px;">
+          <div class="sword" id="swSplit"></div>
+          <div class="ssub" id="ssSplit"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pbar"><div class="ptrack"><div class="pfill" id="pf"></div></div></div>
+    <div class="cbar">
+      <div class="spd">
+        Speed
+        <button class="spdBtn" onclick="setSpd(.5,this)">0.5×</button>
+        <button class="spdBtn active" onclick="setSpd(1,this)">1×</button>
+        <button class="spdBtn" onclick="setSpd(1.5,this)">1.5×</button>
+        <button class="spdBtn" onclick="setSpd(2,this)">2×</button>
+      </div>
+      <button class="repBtn" id="rbtn" onclick="toggleRep()">↻ Repeat</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  CANVAS AVATAR ENGINE — v7: HUMAN-LIKE AVATAR
+//  Features: colorful eyes, hair, ears, skin tones,
+//  refined body proportions, natural motion
+// ════════════════════════════════════════════════════════
+
+const cv = document.getElementById('cv');
+const cx = cv.getContext('2d');
+const cvS = document.getElementById('cvSplit');
+const cxS = cvS.getContext('2d');
+
+function resize(){
+  const s = document.getElementById('stageSingle');
+  const W = s.clientWidth, H = s.clientHeight;
+  cv.width = W; cv.height = H;
+  cvS.width = W/2 || 300; cvS.height = H;
+  // update offsets for both canvases
+  AV.ox = W/2 - 100;
+  AV.oy = H/2 - 175;
+  AV.oxS = (cvS.width)/2 - 100;
+  AV.oyS = H/2 - 175;
+}
+window.addEventListener('resize', resize);
+
+const AV = {
+  ox:0, oy:0, oxS:0, oyS:0,
+  HX:100, HY:55,
+  NX:100, NY:102,
+  SLX:52,  SLY:118,
+  SRX:148, SRY:118,
+  UA:55, FA:52,
+  HAND_R:14,
+};
+
+const NEUTRAL = {
+  rwx:152, rwy:175,
+  lwx:48,  lwy:175,
+  rFing:{i:0,m:0,r:0,p:0,t:0},
+  lFing:{i:0,m:0,r:0,p:0,t:0},
+  expr:'neutral',
+  headTilt:0, headNod:0, lipsOpen:0,
+  rWristRot:0, lWristRot:0,
+  rShoulderY:0, lShoulderY:0,
+  browRaise:0, cheekPuff:0,
+};
+
+let cur = deepCopy(NEUTRAL);
+let kfFrames=[], kfIdx=0, kfStart=0, kfActive=false;
+let animT=0, blinkT=0, blinkY=1, breathT=0, idleT=0;
+let elbowSwayR=0, elbowSwayL=0;
+
+function deepCopy(o){ return JSON.parse(JSON.stringify(o)); }
+
+function lerp(a,b,t){ return a+(b-a)*t; }
+function lerpF(a,b,t){
+  return {i:lerp(a.i,b.i,t),m:lerp(a.m,b.m,t),r:lerp(a.r,b.r,t),p:lerp(a.p,b.p,t),t:lerp(a.t,b.t,t)};
+}
+function lerpFStagger(a,b,t,phaseDir){
+  const offsets = phaseDir >= 0 ? [0, 0.08, 0.16, 0.24] : [0.24, 0.16, 0.08, 0];
+  function st(baseT, off){ return Math.min(1, Math.max(0, (baseT - off) / (1 - off + 0.01))); }
+  function ease3(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+  return {
+    i: lerp(a.i, b.i, ease3(st(t, offsets[0]))),
+    m: lerp(a.m, b.m, ease3(st(t, offsets[1]))),
+    r: lerp(a.r, b.r, ease3(st(t, offsets[2]))),
+    p: lerp(a.p, b.p, ease3(st(t, offsets[3]))),
+    t: lerp(a.t, b.t, ease3(t)),
+  };
+}
+function easeInOut(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+function easeOut(t){ return 1-Math.pow(1-t,3); }
+function easeIn(t){ return t*t*t; }
+function easeOutBack(t){ const c1=1.70158,c3=c1+1; return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2); }
+function applyEase(t,eIn,eOut){
+  if(eIn&&eOut) return easeInOut(t);
+  if(eIn) return easeIn(t);
+  if(eOut) return easeOut(t);
+  return t;
+}
+
+function lerpPose(a, b, t, phase){
+  const closingFingers = phase === 'approach';
+  const headT = Math.min(1, Math.max(0, (t - 0.05) / 0.95));
+  const headTe = easeInOut(headT);
+  const shldT = Math.min(1, t * 1.15);
+  const wristT = phase==='approach' ? easeOutBack(Math.min(1,t)) : easeInOut(t);
+  return {
+    rwx:lerp(a.rwx,b.rwx,t), rwy:lerp(a.rwy,b.rwy,t),
+    lwx:lerp(a.lwx,b.lwx,t), lwy:lerp(a.lwy,b.lwy,t),
+    rFing: lerpFStagger(a.rFing, b.rFing, t, closingFingers ? 1 : -1),
+    lFing: lerpFStagger(a.lFing, b.lFing, t, closingFingers ? 1 : -1),
+    expr: t < 0.45 ? a.expr : b.expr,
+    headTilt:   lerp(a.headTilt||0,   b.headTilt||0,   headTe),
+    headNod:    lerp(a.headNod||0,    b.headNod||0,    headTe),
+    lipsOpen:   lerp(a.lipsOpen||0,   b.lipsOpen||0,   headTe),
+    rWristRot:  lerp(a.rWristRot||0,  b.rWristRot||0,  wristT),
+    lWristRot:  lerp(a.lWristRot||0,  b.lWristRot||0,  wristT),
+    rShoulderY: lerp(a.rShoulderY||0, b.rShoulderY||0, shldT),
+    lShoulderY: lerp(a.lShoulderY||0, b.lShoulderY||0, shldT),
+    browRaise:  lerp(a.browRaise||0,  b.browRaise||0,  headTe),
+    cheekPuff:  lerp(a.cheekPuff||0,  b.cheekPuff||0,  headTe),
+    _rwave:b._rwave, _lwave:b._lwave, _rshake:b._rshake,
+    _rcirc:b._rcirc, _rnod:b._rnod,
+  };
+}
+
+function buildKeyframes(fromPose, signDef, durMs){
+  if(!signDef) return [{from:fromPose, to:NEUTRAL, dur:durMs, eIn:true, eOut:false, phase:'exit'}];
+  const peak = buildPeak(signDef);
+  const approach = durMs * 0.40;
+  const hold     = durMs * 0.32;
+  const exit_    = durMs * 0.28;
+  return [
+    {from:deepCopy(fromPose), to:deepCopy(peak),    dur:approach, eIn:false, eOut:true,  phase:'approach'},
+    {from:deepCopy(peak),     to:deepCopy(peak),    dur:hold,     eIn:false, eOut:false, phase:'hold'},
+    {from:deepCopy(peak),     to:deepCopy(NEUTRAL), dur:exit_,    eIn:true,  eOut:false, phase:'exit'},
+  ];
+}
+
+function buildPeak(s){
+  const nx=100, ny=118;
+  const exag = 1.25;
+  function amp(v, neutral){ return neutral + (v-neutral)*exag; }
+  const rwxRel = (s.rwx||152) - 100;
+  const rwyRel = (s.rwy||175) - 118;
+  const rWristRot = (s.rWristRot !== undefined) ? s.rWristRot : Math.atan2(rwyRel, rwxRel) * 0.18;
+  const lwxRel = (s.lwx||48) - 100;
+  const lwyRel = (s.lwy||175) - 118;
+  const lWristRot = (s.lWristRot !== undefined) ? s.lWristRot : Math.atan2(lwyRel, lwxRel) * -0.18;
+  const rHighness = Math.max(0, (118 - (s.rwy||175)) / 100);
+  const lHighness = Math.max(0, (118 - (s.lwy||175)) / 100);
+  const headNod = s.expr==='question' ? 3 : s.expr==='sad' ? 5 : s.headNod || 0;
+  const browRaise = s.expr==='question' ? 1 : s.expr==='happy' ? 0.5 : s.expr==='sad' ? -0.6 : (s.browRaise||0);
+  return {
+    rwx: amp(s.rwx, nx), rwy: amp(s.rwy, ny),
+    lwx: amp(s.lwx, 200-nx), lwy: amp(s.lwy, ny),
+    rFing: deepCopy(s.rFing||{i:0,m:0,r:0,p:0,t:0}),
+    lFing: deepCopy(s.lFing||{i:0,m:0,r:0,p:0,t:0}),
+    expr: s.expr||'neutral',
+    headTilt:  (s.headTilt||0) * 1.4,
+    headNod:   headNod * 1.3,
+    lipsOpen:  Math.min(1, (s.lipsOpen||0) * 1.5),
+    rWristRot: rWristRot,
+    lWristRot: lWristRot,
+    rShoulderY: -rHighness * 10,
+    lShoulderY: -lHighness * 10,
+    browRaise:  browRaise,
+    cheekPuff:  s.cheekPuff||0,
+    _rwave:!!s._rwave, _lwave:!!s._lwave,
+    _rshake:!!s._rshake, _rcirc:!!s._rcirc, _rnod:!!s._rnod,
+  };
+}
+
+function playKeyframes(frames){
+  kfFrames=frames; kfIdx=0; kfActive=true;
+  kfStart=null; // initialised on first tick so rAF timestamp is used throughout
+}
+
+function tickKeyframes(now){
+  if(!kfActive || kfIdx >= kfFrames.length){ kfActive=false; return; }
+  // Initialise start on the very first rAF tick to avoid performance.now() vs rAF drift
+  if(kfStart===null) kfStart=now;
+  const kf = kfFrames[kfIdx];
+  const elapsed = Math.max(0, now - kfStart);
+  let t = Math.min(elapsed / Math.max(kf.dur, 1), 1);
+  const te = applyEase(t, kf.eIn, kf.eOut);
+  const p = lerpPose(kf.from, kf.to, te, kf.phase);
+  Object.assign(cur, p);
+  if(t >= 1){
+    // Snap cur exactly to the target pose before moving to next keyframe
+    Object.assign(cur, lerpPose(kf.from, kf.to, 1, kf.phase));
+    kfIdx++;
+    kfStart = now; // carry rAF timestamp forward
+    if(kfIdx >= kfFrames.length) kfActive = false;
+  }
+}
+
+function solveIK(sx, sy, wx, wy, ua, fa, elbowBias){
+  const dx = wx-sx, dy = wy-sy;
+  const dist = Math.sqrt(dx*dx+dy*dy);
+  const clampDist = Math.min(dist, ua+fa-2);
+  const baseAng = Math.atan2(dy, dx);
+  const cosA = (ua*ua + clampDist*clampDist - fa*fa) / (2*ua*clampDist);
+  const ang = Math.acos(Math.max(-1, Math.min(1, cosA)));
+  const sign = sx < AV.ox + 100 ? 1 : -1;
+  const elbAng = baseAng + sign*(ang + (elbowBias||0));
+  return {
+    ex: sx + ua*Math.cos(elbAng),
+    ey: sy + ua*Math.sin(elbAng),
+    wx, wy
+  };
+}
+
+// ── SKIN & COLOR PALETTE ──────────────────────────────
+const STROKE = '#c97050';   // warm brown outline (was red wire)
+const SKIN    = '#d4956a';  // medium warm skin
+const SKIND   = '#b8784f';  // darker skin for shadows
+const SKINL   = '#e8b48a';  // lighter skin highlight
+const SKIN2   = '#c8825a';  // mid tone
+const HAIR    = '#2d1a0e';  // dark brown hair
+const HAIRL   = '#5c3520';  // hair highlight
+const SHIRT   = '#3a5a8a';  // blue shirt
+const SHIRT2  = '#2e4870';  // darker shirt shadow
+const SHIRT3  = '#4a6a9a';  // shirt highlight
+const EYE_W   = '#f5f0eb';  // eye white
+const EYE_L   = '#5b8dd9';  // iris left (blue)
+const EYE_R   = '#5b8dd9';  // iris right (blue)
+const PUPIL   = '#1a0f05';  // pupil
+const EYE_SH  = 'rgba(255,255,255,0.85)'; // eye shine
+const LIPS    = '#c06050';  // lip color
+const EAR_S   = '#c07858';  // ear shadow
+const CHEEK   = 'rgba(210,140,120,0.25)'; // cheek blush
+const SW = 2.2;
+
+function toW(lx,ly){ return [AV.ox+lx, AV.oy+ly]; }
+
+function drawRoundLine(ctx, x1,y1,x2,y2,r,fill,stroke){
+  const ang=Math.atan2(y2-y1,x2-x1), per=ang+Math.PI/2;
+  ctx.beginPath();
+  ctx.moveTo(x1+r*Math.cos(per), y1+r*Math.sin(per));
+  ctx.lineTo(x2+r*Math.cos(per), y2+r*Math.sin(per));
+  ctx.arc(x2,y2,r,per,per+Math.PI);
+  ctx.lineTo(x1+r*Math.cos(per+Math.PI), y1+r*Math.sin(per+Math.PI));
+  ctx.arc(x1,y1,r,per+Math.PI,per+2*Math.PI);
+  ctx.closePath();
+  if(fill){ctx.fillStyle=fill;ctx.fill();}
+  ctx.strokeStyle=stroke||STROKE; ctx.lineWidth=1; ctx.stroke();
+}
+
+// Human-like face with colorful eyes, hair, ears
+function drawFace(ctx, hx, hy, pose, bY){
+  const {expr, headTilt, headNod, lipsOpen:lipOpen, browRaise, cheekPuff} = pose;
+  ctx.save();
+  ctx.translate(hx, hy + (headNod||0) * 0.4);
+  ctx.rotate((headTilt||0) * Math.PI/180);
+
+  // ── NECK ──────────────────────────────────────────────
+  const neckLean = (headNod||0) * 0.15;
+  const neckGrd = ctx.createLinearGradient(-7,24,7,24);
+  neckGrd.addColorStop(0, SKIND); neckGrd.addColorStop(1, SKIN);
+  ctx.beginPath();
+  ctx.moveTo(-6+neckLean,24); ctx.lineTo(-6+neckLean*2,46);
+  ctx.lineTo(6+neckLean*2,46); ctx.lineTo(6+neckLean,24);
+  ctx.closePath();
+  ctx.fillStyle=neckGrd; ctx.fill();
+  ctx.strokeStyle=STROKE; ctx.lineWidth=0.7; ctx.stroke();
+
+  // ── EARS ──────────────────────────────────────────────
+  // Left ear
+  ctx.beginPath();
+  ctx.ellipse(-22, 6, 5, 8, -0.2, 0, Math.PI*2);
+  ctx.fillStyle=SKIN; ctx.fill();
+  ctx.strokeStyle=STROKE; ctx.lineWidth=0.8; ctx.stroke();
+  ctx.beginPath();
+  ctx.ellipse(-22, 6, 2.5, 5, -0.2, 0, Math.PI*2);
+  ctx.strokeStyle=EAR_S; ctx.lineWidth=0.6; ctx.stroke();
+  // Right ear
+  ctx.beginPath();
+  ctx.ellipse(22, 6, 5, 8, 0.2, 0, Math.PI*2);
+  ctx.fillStyle=SKIN; ctx.fill();
+  ctx.strokeStyle=STROKE; ctx.lineWidth=0.8; ctx.stroke();
+  ctx.beginPath();
+  ctx.ellipse(22, 6, 2.5, 5, 0.2, 0, Math.PI*2);
+  ctx.strokeStyle=EAR_S; ctx.lineWidth=0.6; ctx.stroke();
+
+  // ── SKULL ─────────────────────────────────────────────
+  const faceGrd = ctx.createRadialGradient(-3,-6,4, 0,0,26);
+  faceGrd.addColorStop(0, SKINL);
+  faceGrd.addColorStop(0.6, SKIN);
+  faceGrd.addColorStop(1, SKIND);
+  ctx.beginPath();
+  ctx.ellipse(0, -2, 22, 27, 0, 0, Math.PI*2);
+  ctx.fillStyle=faceGrd; ctx.fill();
+  ctx.strokeStyle=STROKE; ctx.lineWidth=1.2; ctx.stroke();
+
+  // ── JAW ───────────────────────────────────────────────
+  ctx.beginPath();
+  ctx.moveTo(-14,16); ctx.quadraticCurveTo(0,30,14,16);
+  ctx.strokeStyle=STROKE; ctx.lineWidth=1; ctx.stroke();
+
+  // ── HAIR — Short natural hair ─────────────────────────
+  ctx.beginPath();
+  ctx.ellipse(0, -13, 22, 18, 0, Math.PI, 2*Math.PI);
+  ctx.fillStyle=HAIR; ctx.fill();
+  // hair top part (fuller)
+  ctx.beginPath();
+  ctx.arc(0, -18, 20, -Math.PI*0.9, -Math.PI*0.1);
+  ctx.lineTo(18, -16); ctx.lineTo(-18, -16);
+  ctx.closePath();
+  ctx.fillStyle=HAIR; ctx.fill();
+  // hair highlight
+  ctx.beginPath();
+  ctx.arc(-6, -22, 7, -Math.PI*0.7, -Math.PI*0.1);
+  ctx.strokeStyle=HAIRL; ctx.lineWidth=1.2; ctx.stroke();
+  // slight sideburn
+  ctx.beginPath();
+  ctx.moveTo(-19,-2); ctx.quadraticCurveTo(-21,8,-20,14);
+  ctx.strokeStyle=HAIR; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(19,-2); ctx.quadraticCurveTo(21,8,20,14);
+  ctx.strokeStyle=HAIR; ctx.lineWidth=1.5; ctx.stroke();
+
+  // ── EYEBROWS ──────────────────────────────────────────
+  const br = browRaise||0;
+  const browBaseY = -14;
+  const browLift = br > 0 ? -br*5 : 0;
+  const browFur  = br < 0 ? -br*3 : 0;
+  // Left brow (slightly arched)
+  ctx.beginPath();
+  ctx.moveTo(-16, browBaseY+browFur);
+  ctx.quadraticCurveTo(-9, browBaseY+browLift-3, -3, browBaseY+browFur*0.5);
+  ctx.strokeStyle=HAIR; ctx.lineWidth=2; ctx.lineCap='round'; ctx.stroke();
+  // Right brow
+  ctx.beginPath();
+  ctx.moveTo(3, browBaseY+browFur*0.5);
+  ctx.quadraticCurveTo(9, browBaseY+browLift-3, 16, browBaseY+browFur);
+  ctx.strokeStyle=HAIR; ctx.lineWidth=2; ctx.lineCap='round'; ctx.stroke();
+
+  // ── EYES — colorful with irises ───────────────────────
+  const eyeH = Math.max(0.3, bY * 6.5);
+  const squint = expr==='happy' ? 1.2 : 0;
+
+  // Eye whites
+  ctx.beginPath();
+  ctx.ellipse(-9, -1, 6, eyeH - squint*0.3, 0, 0, Math.PI*2);
+  ctx.fillStyle=EYE_W; ctx.fill();
+  ctx.strokeStyle=STROKE; ctx.lineWidth=0.8; ctx.stroke();
+  ctx.beginPath();
+  ctx.ellipse(9, -1, 6, eyeH - squint*0.3, 0, 0, Math.PI*2);
+  ctx.fillStyle=EYE_W; ctx.fill();
+  ctx.strokeStyle=STROKE; ctx.lineWidth=0.8; ctx.stroke();
+
+  if(bY > 0.3){
+    // Irises (colorful blue-green)
+    const irisRad = Math.min(4, eyeH*0.7);
+    ctx.beginPath(); ctx.arc(-9,-0.8, irisRad, 0, Math.PI*2);
+    const iGrd1 = ctx.createRadialGradient(-9,-0.8,0,-9,-0.8,irisRad);
+    iGrd1.addColorStop(0,'#7ab0ef'); iGrd1.addColorStop(1,'#3a72c0');
+    ctx.fillStyle=iGrd1; ctx.fill();
+    ctx.beginPath(); ctx.arc(9,-0.8, irisRad, 0, Math.PI*2);
+    const iGrd2 = ctx.createRadialGradient(9,-0.8,0,9,-0.8,irisRad);
+    iGrd2.addColorStop(0,'#7ab0ef'); iGrd2.addColorStop(1,'#3a72c0');
+    ctx.fillStyle=iGrd2; ctx.fill();
+
+    // Pupils
+    const pupR = Math.min(2.2, irisRad*0.6);
+    ctx.beginPath(); ctx.arc(-9,-0.6, pupR, 0, Math.PI*2);
+    ctx.fillStyle=PUPIL; ctx.fill();
+    ctx.beginPath(); ctx.arc(9,-0.6, pupR, 0, Math.PI*2);
+    ctx.fillStyle=PUPIL; ctx.fill();
+
+    // Eye shine (two dots for realism)
+    ctx.fillStyle=EYE_SH;
+    ctx.beginPath(); ctx.arc(-10.5,-2.2, 1.1, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(-7.8,-1.0, 0.6, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(7.5,-2.2, 1.1, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(10.2,-1.0, 0.6, 0, Math.PI*2); ctx.fill();
+
+    // Eyelash hints (top)
+    ctx.strokeStyle=HAIR; ctx.lineWidth=0.8;
+    for(let i=-2;i<=2;i++){
+      ctx.beginPath();
+      ctx.moveTo(-9+i*2.2, -eyeH);
+      ctx.lineTo(-9+i*2.2, -eyeH-2.5+Math.abs(i)*0.4);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(9+i*2.2, -eyeH);
+      ctx.lineTo(9+i*2.2, -eyeH-2.5+Math.abs(i)*0.4);
+      ctx.stroke();
+    }
+  }
+
+  // ── CHEEKS — subtle blush ─────────────────────────────
+  if(expr==='happy' || (cheekPuff||0) > 0.1){
+    const blushAlpha = expr==='happy' ? 0.3 : (cheekPuff||0)*0.3;
+    ctx.beginPath();
+    ctx.ellipse(-15, 8, (cheekPuff||0.3)*7+3, (cheekPuff||0.3)*4+2, 0.3, 0, Math.PI*2);
+    ctx.fillStyle=`rgba(230,140,120,${blushAlpha})`; ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(15, 8, (cheekPuff||0.3)*7+3, (cheekPuff||0.3)*4+2, -0.3, 0, Math.PI*2);
+    ctx.fillStyle=`rgba(230,140,120,${blushAlpha})`; ctx.fill();
+  }
+
+  // ── NOSE ──────────────────────────────────────────────
+  ctx.beginPath();
+  ctx.moveTo(0,3); ctx.quadraticCurveTo(-3,10,-3,14);
+  ctx.quadraticCurveTo(0,16,3,14); ctx.quadraticCurveTo(3,10,0,3);
+  ctx.strokeStyle=STROKE; ctx.lineWidth=0.8; ctx.stroke();
+  // nostrils
+  ctx.beginPath(); ctx.ellipse(-3,14.5,1.8,1.2,0.3,0,Math.PI*2);
+  ctx.strokeStyle=STROKE; ctx.lineWidth=0.6; ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(3,14.5,1.8,1.2,-0.3,0,Math.PI*2);
+  ctx.strokeStyle=STROKE; ctx.lineWidth=0.6; ctx.stroke();
+
+  // ── MOUTH ─────────────────────────────────────────────
+  const my = 20;
+  ctx.beginPath();
+  if(expr==='happy'){
+    ctx.moveTo(-9,my-1); ctx.quadraticCurveTo(0,my+10,9,my-1);
+    ctx.strokeStyle=LIPS; ctx.lineWidth=1.5; ctx.lineCap='round'; ctx.stroke();
+    if(lipOpen>0.1){
+      ctx.beginPath();
+      ctx.moveTo(-7,my); ctx.quadraticCurveTo(0,my+9+lipOpen*4,7,my);
+      ctx.fillStyle='rgba(80,30,20,0.5)'; ctx.fill();
+      // teeth hint
+      ctx.fillStyle='rgba(245,242,238,0.7)';
+      ctx.fillRect(-5,my,10,3);
+    }
+  } else if(expr==='sad'){
+    ctx.moveTo(-8,my+5); ctx.quadraticCurveTo(0,my-2,8,my+5);
+    ctx.strokeStyle=LIPS; ctx.lineWidth=1.5; ctx.lineCap='round'; ctx.stroke();
+  } else if(expr==='question'){
+    ctx.moveTo(-6,my+2); ctx.quadraticCurveTo(0,my+7,6,my+2);
+    ctx.strokeStyle=LIPS; ctx.lineWidth=1.5; ctx.lineCap='round'; ctx.stroke();
+    if(lipOpen>0.05){
+      ctx.beginPath();
+      ctx.moveTo(-5,my+3); ctx.quadraticCurveTo(0,my+7+lipOpen*3,5,my+3);
+      ctx.fillStyle='rgba(80,30,20,0.35)'; ctx.fill();
+    }
+  } else {
+    const lop = lipOpen * 4;
+    ctx.moveTo(-8,my+lop*0.2); ctx.quadraticCurveTo(0,my+2+lop,8,my+lop*0.2);
+    ctx.strokeStyle=LIPS; ctx.lineWidth=1.5; ctx.lineCap='round'; ctx.stroke();
+  }
+  // upper lip line
+  ctx.beginPath();
+  ctx.moveTo(-6,my); ctx.quadraticCurveTo(-3,my-2,0,my);
+  ctx.quadraticCurveTo(3,my-2,6,my);
+  ctx.strokeStyle=LIPS; ctx.lineWidth=0.7; ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawBody(ctx, ox, oy, pose){
+  const rShlY = pose.rShoulderY||0;
+  const lShlY = pose.lShoulderY||0;
+  const lean = (pose.headTilt||0) * 0.15;
+
+  const slx=ox+AV.SLX+lean, sly=oy+AV.SLY+lShlY;
+  const srx=ox+AV.SRX+lean, sry=oy+AV.SRY+rShlY;
+
+  // ── SHIRT / TORSO ────────────────────────────────────
+  const torsoGrd = ctx.createLinearGradient(slx,sly,srx+14,sry+108);
+  torsoGrd.addColorStop(0, SHIRT3);
+  torsoGrd.addColorStop(0.5, SHIRT);
+  torsoGrd.addColorStop(1, SHIRT2);
+
+  ctx.beginPath();
+  ctx.moveTo(slx,sly); ctx.lineTo(srx,sry);
+  ctx.lineTo(ox+AV.SRX+15+lean,oy+AV.SRY+108);
+  ctx.lineTo(ox+AV.SLX-15+lean,oy+AV.SLY+108);
+  ctx.closePath();
+  ctx.fillStyle=torsoGrd; ctx.fill();
+  ctx.strokeStyle='#1e3055'; ctx.lineWidth=1.2; ctx.stroke();
+
+  // collar
+  ctx.beginPath();
+  ctx.moveTo(ox+94+lean, oy+105);
+  ctx.lineTo(ox+100+lean, oy+125);
+  ctx.lineTo(ox+106+lean, oy+105);
+  ctx.strokeStyle=SHIRT2; ctx.lineWidth=1.5; ctx.stroke();
+
+  // shirt button line
+  ctx.beginPath();
+  ctx.moveTo(ox+100+lean, oy+122);
+  ctx.lineTo(ox+100+lean, oy+AV.SRY+108);
+  ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=1; ctx.stroke();
+
+  // ── SHOULDER JOINTS ──────────────────────────────────
+  // Left shoulder cap
+  ctx.beginPath(); ctx.arc(slx, sly, 8, 0, Math.PI*2);
+  const shGrd = ctx.createRadialGradient(slx-2,sly-2,1,slx,sly,8);
+  shGrd.addColorStop(0, SHIRT3); shGrd.addColorStop(1, SHIRT2);
+  ctx.fillStyle=shGrd; ctx.fill();
+  ctx.strokeStyle='#1e3055'; ctx.lineWidth=0.8; ctx.stroke();
+  // Right shoulder cap
+  ctx.beginPath(); ctx.arc(srx, sry, 8, 0, Math.PI*2);
+  ctx.fillStyle=shGrd; ctx.fill();
+  ctx.strokeStyle='#1e3055'; ctx.lineWidth=0.8; ctx.stroke();
+
+  // ── LEGS ─────────────────────────────────────────────
+  const legGrd = ctx.createLinearGradient(ox,oy+AV.SLY+108,ox,oy+AV.SLY+195);
+  legGrd.addColorStop(0,'#3a3020'); legGrd.addColorStop(1,'#1a1510');
+  // left leg
+  ctx.beginPath();
+  ctx.moveTo(ox+AV.SLX-3+lean, oy+AV.SLY+108);
+  ctx.lineTo(ox+AV.SLX-10+lean, oy+AV.SLY+190);
+  ctx.lineTo(ox+AV.SLX-20+lean,oy+AV.SLY+190);
+  ctx.strokeStyle='#2a2015'; ctx.lineWidth=1.2; ctx.stroke();
+  // right leg
+  ctx.beginPath();
+  ctx.moveTo(ox+AV.SRX+3+lean, oy+AV.SRY+108);
+  ctx.lineTo(ox+AV.SRX+10+lean, oy+AV.SRY+190);
+  ctx.lineTo(ox+AV.SRX+20+lean,oy+AV.SRY+190);
+  ctx.strokeStyle='#2a2015'; ctx.lineWidth=1.2; ctx.stroke();
+  // shoes
+  ctx.beginPath();
+  ctx.ellipse(ox+AV.SLX-15+lean, oy+AV.SLY+190, 10, 4, -0.2, 0, Math.PI*2);
+  ctx.fillStyle='#1a1510'; ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(ox+AV.SRX+15+lean, oy+AV.SRY+190, 10, 4, 0.2, 0, Math.PI*2);
+  ctx.fillStyle='#1a1510'; ctx.fill();
+
+  return {slx, sly, srx, sry};
+}
+
+function drawArm(ctx, sx, sy, elbow, wrist, side){
+  // sleeve
+  const slvGrd = ctx.createLinearGradient(sx,sy,elbow.ex,elbow.ey);
+  slvGrd.addColorStop(0, side==='R'?SHIRT3:SHIRT);
+  slvGrd.addColorStop(1, SHIRT2);
+  drawRoundLine(ctx, sx,sy, elbow.ex,elbow.ey, 7, slvGrd, '#1e3055');
+  // elbow joint
+  ctx.beginPath(); ctx.arc(elbow.ex,elbow.ey, 5.5, 0, Math.PI*2);
+  const elbGrd = ctx.createRadialGradient(elbow.ex-1,elbow.ey-1,1,elbow.ex,elbow.ey,5.5);
+  elbGrd.addColorStop(0, SKINL); elbGrd.addColorStop(1, SKIND);
+  ctx.fillStyle=elbGrd; ctx.fill();
+  ctx.strokeStyle=STROKE; ctx.lineWidth=1; ctx.stroke();
+  // forearm (skin)
+  const faGrd = ctx.createLinearGradient(elbow.ex,elbow.ey,wrist.wx,wrist.wy);
+  faGrd.addColorStop(0,SKIN); faGrd.addColorStop(1,SKINL);
+  drawRoundLine(ctx, elbow.ex,elbow.ey, wrist.wx,wrist.wy, 5, faGrd, STROKE);
+}
+
+function drawHand(ctx, wx, wy, fing, side, dx, dy, wristRot){
+  ctx.save();
+  ctx.translate(wx, wy);
+  const baseAng = Math.atan2(dy||0, dx||((side==='R')?1:-1));
+  const wristAngle = (side==='R' ? 0.2 : -0.2) + (wristRot||0);
+  ctx.rotate(baseAng + wristAngle);
+
+  const d = side==='R' ? 1 : -1;
+  const flen = [12,13,11,9];
+  const foff = [-7,-2.5,2.5,7];
+  const fbase = -11;
+
+  // palm gradient
+  const grd = ctx.createRadialGradient(-2,-2, 2, 0, 2, 13);
+  grd.addColorStop(0, SKINL); grd.addColorStop(1, SKIN);
+
+  ctx.beginPath();
+  ctx.ellipse(0, 1, 10, 13, 0, 0, Math.PI*2);
+  ctx.fillStyle=grd; ctx.fill();
+  ctx.strokeStyle=STROKE; ctx.lineWidth=1.2; ctx.stroke();
+
+  // knuckle line
+  ctx.beginPath();
+  ctx.moveTo(-8, fbase+2); ctx.lineTo(8, fbase+2);
+  ctx.strokeStyle='rgba(160,100,70,0.3)'; ctx.lineWidth=0.8; ctx.stroke();
+
+  // fingers
+  const fins = [fing.i, fing.m, fing.r, fing.p];
+  const naturalSpread = [0.04, 0, -0.02, -0.06];
+  for(let f=0;f<4;f++){
+    const curl = fins[f];
+    const fl = flen[f];
+    const fx = foff[f];
+    const segs = [fl*0.38, fl*0.34, fl*0.28];
+    ctx.save();
+    ctx.translate(fx, fbase);
+    ctx.rotate(naturalSpread[f] * (1-curl));
+    const a0 = curl * 78 * Math.PI/180;
+    ctx.rotate(a0);
+    // proximal phalanx
+    const fGrd = ctx.createLinearGradient(-2.2,-segs[0],2.2,-segs[0]);
+    fGrd.addColorStop(0,SKIND); fGrd.addColorStop(0.5,SKINL); fGrd.addColorStop(1,SKIN2);
+    ctx.beginPath(); ctx.roundRect(-2.2,-segs[0], 4.4,segs[0], 2.5);
+    ctx.fillStyle=fGrd; ctx.fill(); ctx.strokeStyle=STROKE; ctx.lineWidth=0.9; ctx.stroke();
+    ctx.translate(0,-segs[0]);
+    // middle phalanx
+    ctx.rotate(a0*0.75);
+    ctx.beginPath(); ctx.roundRect(-2,-segs[1], 4,segs[1], 2);
+    ctx.fillStyle=SKIN; ctx.fill(); ctx.strokeStyle=STROKE; ctx.lineWidth=0.8; ctx.stroke();
+    // knuckle crease
+    ctx.beginPath(); ctx.moveTo(-1.5, -1); ctx.lineTo(1.5, -1);
+    ctx.strokeStyle='rgba(160,100,70,0.25)'; ctx.lineWidth=0.7; ctx.stroke();
+    ctx.translate(0,-segs[1]);
+    // distal phalanx with fingernail hint
+    ctx.rotate(a0*0.55);
+    ctx.beginPath(); ctx.roundRect(-1.8,-segs[2], 3.6,segs[2], 3);
+    ctx.fillStyle=SKIND; ctx.fill(); ctx.strokeStyle=STROKE; ctx.lineWidth=0.7; ctx.stroke();
+    // nail
+    ctx.beginPath(); ctx.roundRect(-1.3,-segs[2]+0.5, 2.6,segs[2]*0.55, 1.5);
+    ctx.fillStyle='rgba(240,200,180,0.6)'; ctx.fill();
+    ctx.restore();
+  }
+
+  // thumb
+  ctx.save();
+  ctx.translate(-d*11, 3);
+  ctx.rotate(d * (-0.5 + fing.t * 1.2));
+  ctx.beginPath(); ctx.roundRect(-2.5,-10, 5,10, 3);
+  ctx.fillStyle=SKIN; ctx.fill(); ctx.strokeStyle=STROKE; ctx.lineWidth=0.9; ctx.stroke();
+  ctx.translate(0,-10);
+  ctx.rotate(d * fing.t * 0.6);
+  ctx.beginPath(); ctx.roundRect(-2.5,-7.5, 5,7.5, 3.5);
+  ctx.fillStyle=SKIND; ctx.fill(); ctx.strokeStyle=STROKE; ctx.lineWidth=0.8; ctx.stroke();
+  // thumb nail
+  ctx.beginPath(); ctx.roundRect(-1.5,-7, 3,4.5, 1.5);
+  ctx.fillStyle='rgba(240,200,180,0.6)'; ctx.fill();
+  ctx.restore();
+
+  ctx.restore();
+}
+
+let frameT=0, lastTs=null;
+function renderFrame(ts){
+  if(!lastTs) lastTs=ts;
+  const dt = Math.min((ts-lastTs)/1000, 0.05);
+  lastTs=ts;
+
+  tickKeyframes(ts);
+  cx.clearRect(0,0,cv.width,cv.height);
+
+  breathT += dt * (kfActive ? 0.4 : 1.0);
+  idleT   += dt * (kfActive ? 0.3 : 0.8);
+  const breathOff   = Math.sin(breathT*1.1) * (kfActive ? 0.5 : 2.2);
+  const idleHeadOff = Math.sin(idleT*0.7)   * (kfActive ? 0.3 : 1.2);
+  const idleBodyOff = Math.sin(idleT*0.5)   * (kfActive ? 0.2 : 0.8);
+
+  blinkT += dt;
+  if(blinkT > 3.8 && blinkY === 1){
+    blinkY=0.05; setTimeout(()=>{ blinkY=1; blinkT=0; }, 110);
+  }
+
+  frameT += dt;
+  let rWaveOff=0, lWaveOff=0, rShakeOff=0, rNodOff=0, rCircOff={x:0,y:0};
+  if(cur._rwave)  rWaveOff  = Math.sin(frameT*6.5)*18;
+  if(cur._lwave)  lWaveOff  = Math.sin(frameT*6.5+1)*18;
+  if(cur._rshake) rShakeOff = Math.sin(frameT*10)*11;
+  if(cur._rnod)   rNodOff   = Math.sin(frameT*8)*11;
+  if(cur._rcirc){ rCircOff.x=Math.cos(frameT*5)*13; rCircOff.y=Math.sin(frameT*5)*11; }
+
+  const targetSwayR = rWaveOff * 0.12 + rCircOff.x * 0.1;
+  const targetSwayL = lWaveOff * 0.12;
+  elbowSwayR += (targetSwayR - elbowSwayR) * Math.min(1, dt*8);
+  elbowSwayL += (targetSwayL - elbowSwayL) * Math.min(1, dt*8);
+
+  // Draw to main canvas
+  renderAvatar(cx, AV.ox + idleBodyOff, AV.oy + breathOff, breathOff, idleHeadOff,
+    rWaveOff, lWaveOff, rShakeOff, rNodOff, rCircOff);
+
+  // Also draw to split canvas if in both-mode
+  if(viewMode === 'both'){
+    cxS.clearRect(0,0,cvS.width,cvS.height);
+    renderAvatar(cxS, AV.oxS + idleBodyOff, AV.oyS + breathOff, breathOff, idleHeadOff,
+      rWaveOff, lWaveOff, rShakeOff, rNodOff, rCircOff);
+  }
+
+  requestAnimationFrame(renderFrame);
+}
+
+function renderAvatar(ctx, ox, oy, breathOff, idleHeadOff, rWaveOff, lWaveOff, rShakeOff, rNodOff, rCircOff){
+  // shadow
+  ctx.beginPath(); ctx.ellipse(ox+100, oy+380, 42, 8, 0, 0, Math.PI*2);
+  ctx.fillStyle='rgba(0,0,0,0.20)'; ctx.fill();
+
+  const shoulders = drawBody(ctx, ox, oy, cur);
+  const lean = (cur.headTilt||0) * 0.15;
+  const {slx, sly, srx, sry} = shoulders;
+
+  const rWrist = {
+    wx: ox+cur.rwx + rWaveOff + rShakeOff + rCircOff.x + lean,
+    wy: oy+cur.rwy + rNodOff  + rCircOff.y + breathOff*0.3
+  };
+  const lWrist = {
+    wx: ox+cur.lwx + lWaveOff + lean,
+    wy: oy+cur.lwy + breathOff*0.3
+  };
+
+  const rHeightFactor = Math.max(-0.25, Math.min(0.25, (118 - cur.rwy) / 200));
+  const lHeightFactor = Math.max(-0.25, Math.min(0.25, (118 - cur.lwy) / 200));
+  const rIK = solveIK(srx, sry, rWrist.wx, rWrist.wy, AV.UA, AV.FA, rHeightFactor);
+  const lIK = solveIK(slx, sly, lWrist.wx, lWrist.wy, AV.UA, AV.FA, -lHeightFactor);
+
+  rIK.ex += elbowSwayR * 0.3;
+  lIK.ex += elbowSwayL * 0.3;
+
+  drawArm(ctx, slx, sly, lIK, {wx:lWrist.wx, wy:lWrist.wy}, 'L');
+  drawArm(ctx, srx, sry, rIK, {wx:rWrist.wx, wy:rWrist.wy}, 'R');
+
+  const rdx=rWrist.wx-rIK.ex, rdy=rWrist.wy-rIK.ey;
+  const ldx=lWrist.wx-lIK.ex, ldy=lWrist.wy-lIK.ey;
+  drawHand(ctx, rWrist.wx, rWrist.wy, cur.rFing, 'R', rdx, rdy, cur.rWristRot);
+  drawHand(ctx, lWrist.wx, lWrist.wy, cur.lFing, 'L', ldx, ldy, cur.lWristRot);
+
+  const [hx,hy] = [ox+AV.HX+lean*0.5, oy+AV.HY + idleHeadOff - breathOff*0.15];
+  drawFace(ctx, hx, hy, cur, blinkY);
+}
+
+requestAnimationFrame(renderFrame);
+resize();
+
+// ════════════════════════════════════════════════════════
+//  SIGN LIBRARY
+// ════════════════════════════════════════════════════════
+function f(i,m,r,p,t){ return {i,m,r,p,t}; }
+const OPEN  = f(0,0,0,0,0);
+const FIST  = f(1,1,1,1,0.6);
+const POINT = f(0,1,1,1,0.5);
+const PEACE = f(0,0,1,1,0.5);
+const CHND  = f(0.5,0.5,0.5,0.5,0.3);
+const BENT  = f(0.3,0.3,0.3,0.3,0.2);
+const FLAT  = f(0,0,0,0,0);
+const YHND  = f(1,1,1,0,0);
+const LHND  = f(0,1,1,1,0);
+const HOOK  = f(0.5,1,1,1,0.5);
+const THREE = f(0,0,0,1,0.9);
+const OK    = f(0.5,0,0,0,0.5);
+const HHND  = f(0,0,1,1,0.5);
+const MID   = f(1,0,1,1,0.5);
+
+const SIGNS = {
+HELLO:{rwx:132,rwy:32,lwx:48,lwy:175,rFing:OPEN,lFing:FIST,expr:'happy',headTilt:2,lipsOpen:0.4,_rwave:true,desc:'Open right hand waves at forehead',dur:1300},
+HI:{rwx:132,rwy:32,lwx:48,lwy:175,rFing:OPEN,lFing:FIST,expr:'happy',headTilt:2,lipsOpen:0.4,_rwave:true,desc:'Open right hand waves at forehead',dur:1200},
+NAMASTE:{rwx:108,rwy:148,lwx:92,lwy:148,rFing:FLAT,lFing:FLAT,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Both palms pressed together',dur:1400},
+HOW:{rwx:118,rwy:100,lwx:82,lwy:100,rFing:BENT,lFing:BENT,expr:'question',headTilt:5,lipsOpen:0.2,desc:'Bent fingers brush forward',dur:1000},
+ARE:{rwx:140,rwy:145,lwx:48,lwy:175,rFing:FLAT,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Flat hand moves forward',dur:700},
+YOU:{rwx:155,rwy:105,lwx:48,lwy:175,rFing:POINT,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Index finger points toward person',dur:800},
+FINE:{rwx:115,rwy:138,lwx:48,lwy:175,rFing:FLAT,lFing:FIST,expr:'happy',headTilt:2,lipsOpen:0.3,desc:'Flat hand moves from chest forward',dur:900},
+THANK_YOU:{rwx:105,rwy:82,lwx:48,lwy:175,rFing:FLAT,lFing:FIST,expr:'happy',headTilt:3,lipsOpen:0.3,desc:'Flat hand moves from lips outward',dur:1100},
+WELCOME:{rwx:125,rwy:145,lwx:75,lwy:145,rFing:FLAT,lFing:FLAT,expr:'happy',headTilt:0,lipsOpen:0.4,desc:'Both open hands sweep inward',dur:1200},
+PLEASE:{rwx:108,rwy:148,lwx:48,lwy:175,rFing:FLAT,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0.1,_rcirc:true,desc:'Flat hand circles on chest',dur:1100},
+HELP:{rwx:100,rwy:150,lwx:100,lwy:160,rFing:FIST,lFing:FLAT,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Fist on open palm, both lift up',dur:1200},
+EXCUSE:{rwx:108,rwy:148,lwx:92,lwy:155,rFing:PEACE,lFing:FLAT,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Fingers brush across left palm',dur:1000},
+SORRY:{rwx:105,rwy:148,lwx:48,lwy:175,rFing:FIST,lFing:FIST,expr:'sad',headTilt:-2,lipsOpen:0,_rcirc:true,desc:'Fist circles over heart',dur:1100},
+NICE:{rwx:110,rwy:148,lwx:88,lwy:155,rFing:FLAT,lFing:FLAT,expr:'happy',headTilt:2,lipsOpen:0.3,desc:'Right hand brushes left palm',dur:900},
+MEET:{rwx:118,rwy:115,lwx:82,lwy:115,rFing:POINT,lFing:POINT,expr:'happy',headTilt:0,lipsOpen:0.2,desc:'Both index fingers come together',dur:1000},
+GOODBYE:{rwx:132,rwy:35,lwx:48,lwy:175,rFing:OPEN,lFing:FIST,expr:'happy',headTilt:2,lipsOpen:0.3,_rwave:true,desc:'Open hand waves',dur:1300},
+WHAT:{rwx:125,rwy:105,lwx:75,lwy:105,rFing:OPEN,lFing:OPEN,expr:'question',headTilt:6,lipsOpen:0.2,_rshake:true,desc:'Spread fingers waggle',dur:1000},
+YOUR:{rwx:155,rwy:120,lwx:48,lwy:175,rFing:FLAT,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Flat hand pushed toward person',dur:800},
+NAME:{rwx:118,rwy:118,lwx:82,lwy:118,rFing:HHND,lFing:HHND,expr:'neutral',headTilt:0,lipsOpen:0,desc:'H-hands tap index fingers together',dur:1000},
+I:{rwx:100,rwy:138,lwx:48,lwy:175,rFing:POINT,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Point index finger to self',dur:800},
+MY:{rwx:100,rwy:145,lwx:48,lwy:175,rFing:FLAT,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Flat hand placed on chest',dur:800},
+AGE:{rwx:108,rwy:82,lwx:48,lwy:175,rFing:HOOK,lFing:FIST,expr:'question',headTilt:3,lipsOpen:0,desc:'X-hand near chin then counting',dur:1000},
+WHERE:{rwx:148,rwy:105,lwx:48,lwy:175,rFing:POINT,lFing:FIST,expr:'question',headTilt:5,lipsOpen:0.1,_rshake:true,desc:'Index finger wags side to side',dur:1000},
+FROM:{rwx:118,rwy:128,lwx:82,lwy:138,rFing:HOOK,lFing:FLAT,expr:'neutral',headTilt:0,lipsOpen:0,desc:'X-hand pulls from non-dominant hand',dur:900},
+DOING:{rwx:122,rwy:105,lwx:78,lwy:105,rFing:POINT,lFing:POINT,expr:'question',headTilt:4,lipsOpen:0.1,desc:'D-hands rotate forward',dur:1000},
+WORK:{rwx:118,rwy:140,lwx:82,lwy:140,rFing:FIST,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Wrists tap together',dur:1000},
+STUDY:{rwx:110,rwy:148,lwx:88,lwy:158,rFing:BENT,lFing:FLAT,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Fingers brush toward open palm',dur:1000},
+UNDERSTAND:{rwx:118,rwy:45,lwx:48,lwy:175,rFing:FIST,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Index flicks up from fist at forehead',dur:1000},
+NOT:{rwx:105,rwy:72,lwx:48,lwy:175,rFing:{i:1,m:1,r:1,p:1,t:0},lFing:FIST,expr:'neutral',headTilt:-2,lipsOpen:0,desc:'Thumb brushes under chin',dur:900},
+REPEAT:{rwx:110,rwy:148,lwx:90,lwy:155,rFing:CHND,lFing:FLAT,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Curved hand circles back into palm',dur:1100},
+SLOW:{rwx:112,rwy:148,lwx:88,lwy:155,rFing:FLAT,lFing:FLAT,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Right hand slowly slides up left forearm',dur:1200},
+SPEAK:{rwx:100,rwy:88,lwx:48,lwy:175,rFing:BENT,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0.5,desc:'Fingers flutter near mouth',dur:1000},
+HUNGRY:{rwx:100,rwy:148,lwx:48,lwy:175,rFing:CHND,lFing:FIST,expr:'sad',headTilt:0,lipsOpen:0,desc:'C-hand slides down chest',dur:1100},
+THIRSTY:{rwx:100,rwy:68,lwx:48,lwy:175,rFing:POINT,lFing:FIST,expr:'sad',headTilt:0,lipsOpen:0,desc:'Index finger traces throat',dur:1100},
+TIRED:{rwx:55,rwy:148,lwx:45,lwy:148,rFing:BENT,lFing:BENT,expr:'sad',headTilt:-3,lipsOpen:0,desc:'Bent hands drop at sides',dur:1200},
+NEED:{rwx:130,rwy:118,lwx:48,lwy:175,rFing:HOOK,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Hook index finger, pull down',dur:1000},
+WATER:{rwx:105,rwy:72,lwx:48,lwy:175,rFing:THREE,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'W-hand (3 fingers) taps chin',dur:1000},
+GO:{rwx:155,rwy:118,lwx:48,lwy:175,rFing:POINT,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Index finger points forward',dur:900},
+COME:{rwx:115,rwy:105,lwx:48,lwy:175,rFing:HOOK,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Index finger curls back toward self',dur:900},
+HERE:{rwx:120,rwy:120,lwx:80,lwy:120,rFing:POINT,lFing:POINT,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Both index fingers point down',dur:800},
+WAIT:{rwx:120,rwy:118,lwx:80,lwy:118,rFing:BENT,lFing:BENT,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Curved hands wiggle fingers',dur:1000},
+HOME:{rwx:105,rwy:78,lwx:48,lwy:175,rFing:BENT,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Fingertips tap chin then cheek',dur:1100},
+LATE:{rwx:145,rwy:145,lwx:48,lwy:175,rFing:FLAT,lFing:FIST,expr:'neutral',headTilt:-2,lipsOpen:0,desc:'Hand drops and swings behind',dur:1000},
+CALL:{rwx:78,rwy:35,lwx:48,lwy:175,rFing:YHND,lFing:FIST,expr:'neutral',headTilt:3,lipsOpen:0,desc:'Y-hand at ear (phone shape)',dur:1000},
+LATER:{rwx:140,rwy:118,lwx:48,lwy:175,rFing:LHND,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'L-hand rotates outward',dur:1000},
+RESTROOM:{rwx:130,rwy:115,lwx:48,lwy:175,rFing:{i:1,m:0,r:0,p:1,t:1},lFing:FIST,expr:'question',headTilt:4,lipsOpen:0.1,_rshake:true,desc:'R-hand shakes side to side',dur:1100},
+TIME:{rwx:118,rwy:128,lwx:82,lwy:138,rFing:POINT,lFing:FLAT,expr:'question',headTilt:3,lipsOpen:0,desc:'Index taps wrist',dur:1000},
+OKAY:{rwx:125,rwy:128,lwx:48,lwy:175,rFing:OK,lFing:FIST,expr:'happy',headTilt:1,lipsOpen:0.2,desc:'O-K: thumb+index circle',dur:900},
+HAPPEN:{rwx:122,rwy:105,lwx:78,lwy:105,rFing:POINT,lFing:POINT,expr:'question',headTilt:5,lipsOpen:0.2,desc:'Both index fingers rotate outward',dur:1100},
+ASSISTANCE:{rwx:112,rwy:148,lwx:88,lwy:158,rFing:FLAT,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Fist on palm, both lift',dur:1200},
+DOCTOR:{rwx:118,rwy:135,lwx:82,lwy:145,rFing:HHND,lFing:FLAT,expr:'neutral',headTilt:0,lipsOpen:0,desc:'D-hand taps wrist (pulse)',dur:1000},
+EMERGENCY:{rwx:120,rwy:95,lwx:80,lwy:95,rFing:OPEN,lFing:OPEN,expr:'sad',headTilt:-4,lipsOpen:0.4,_rwave:true,_lwave:true,desc:'Both E-hands wave frantically',dur:1400},
+LIKE:{rwx:105,rwy:145,lwx:48,lwy:175,rFing:MID,lFing:FIST,expr:'happy',headTilt:2,lipsOpen:0.3,desc:'Middle finger flicks out from chest',dur:1000},
+GOOD:{rwx:105,rwy:75,lwx:48,lwy:175,rFing:FLAT,lFing:FIST,expr:'happy',headTilt:3,lipsOpen:0.4,desc:'Flat right hand moves from chin forward',dur:1000},
+BAD:{rwx:105,rwy:75,lwx:48,lwy:175,rFing:FLAT,lFing:FIST,expr:'sad',headTilt:-2,lipsOpen:0,desc:'Hand flips down from chin',dur:1000},
+AGREE:{rwx:118,rwy:118,lwx:82,lwy:118,rFing:POINT,lFing:POINT,expr:'happy',headTilt:0,lipsOpen:0.2,desc:'Index fingers align together',dur:1000},
+DISAGREE:{rwx:138,rwy:115,lwx:65,lwy:118,rFing:POINT,lFing:POINT,expr:'neutral',headTilt:-2,lipsOpen:0,desc:'Index fingers separate',dur:1000},
+NO_PROBLEM:{rwx:125,rwy:118,lwx:75,lwy:118,rFing:FLAT,lFing:FLAT,expr:'happy',headTilt:2,lipsOpen:0.3,_rwave:true,desc:'Both palms wave',dur:1200},
+OF_COURSE:{rwx:115,rwy:128,lwx:48,lwy:175,rFing:FIST,lFing:FIST,expr:'happy',headTilt:2,lipsOpen:0.3,_rnod:true,desc:'Fist nods firmly',dur:900},
+MAYBE:{rwx:118,rwy:118,lwx:82,lwy:118,rFing:FLAT,lFing:FLAT,expr:'neutral',headTilt:3,lipsOpen:0.1,_rshake:true,desc:'Both flat hands rock',dur:1100},
+SEE:{rwx:122,rwy:55,lwx:48,lwy:175,rFing:PEACE,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'V-hand from eyes points outward',dur:900},
+YES:{rwx:115,rwy:115,lwx:48,lwy:175,rFing:FIST,lFing:FIST,expr:'happy',headTilt:0,lipsOpen:0.2,_rnod:true,desc:'Fist nods up and down',dur:900},
+NO:{rwx:130,rwy:105,lwx:48,lwy:175,rFing:{i:0,m:0,r:1,p:1,t:0.5},lFing:FIST,expr:'neutral',headTilt:-3,lipsOpen:0,_rshake:true,desc:'Index and middle tap thumb',dur:900},
+WE:{rwx:128,rwy:105,lwx:72,lwy:105,rFing:POINT,lFing:POINT,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Both index fingers point outward',dur:900},
+THIS:{rwx:105,rwy:138,lwx:48,lwy:175,rFing:POINT,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Index points down',dur:700},
+THAT:{rwx:148,rwy:110,lwx:48,lwy:175,rFing:POINT,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Index points away',dur:700},
+WANT:{rwx:118,rwy:125,lwx:82,lwy:125,rFing:CHND,lFing:CHND,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Curved hands pull toward body',dur:1100},
+// Alphabet
+A:{rwx:125,rwy:118,lwx:48,lwy:175,rFing:FIST,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'A — Fist',dur:600},
+B:{rwx:118,rwy:108,lwx:48,lwy:175,rFing:FLAT,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'B — Flat hand',dur:600},
+C:{rwx:118,rwy:110,lwx:48,lwy:175,rFing:CHND,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'C — Curved hand',dur:600},
+D:{rwx:118,rwy:108,lwx:48,lwy:175,rFing:{i:0,m:0.6,r:0.6,p:0.6,t:0.4},lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'D',dur:600},
+E:{rwx:118,rwy:108,lwx:48,lwy:175,rFing:{i:0.8,m:0.8,r:0.8,p:0.8,t:0.5},lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'E',dur:600},
+F:{rwx:118,rwy:108,lwx:48,lwy:175,rFing:OK,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'F',dur:600},
+G:{rwx:130,rwy:108,lwx:48,lwy:175,rFing:POINT,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'G',dur:600},
+H:{rwx:130,rwy:108,lwx:48,lwy:175,rFing:HHND,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'H',dur:600},
+J:{rwx:118,rwy:108,lwx:48,lwy:175,rFing:YHND,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'J',dur:700},
+K:{rwx:118,rwy:108,lwx:48,lwy:175,rFing:{i:0,m:0,r:1,p:1,t:0.3},lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'K',dur:600},
+L:{rwx:125,rwy:108,lwx:48,lwy:175,rFing:LHND,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'L',dur:600},
+M:{rwx:118,rwy:108,lwx:48,lwy:175,rFing:{i:0.9,m:0.9,r:0.9,p:1,t:0.5},lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'M',dur:600},
+N:{rwx:118,rwy:108,lwx:48,lwy:175,rFing:{i:0.9,m:0.9,r:1,p:1,t:0.5},lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'N',dur:600},
+O:{rwx:118,rwy:108,lwx:48,lwy:175,rFing:{i:0.5,m:0.5,r:0.5,p:0.5,t:0.3},lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'O',dur:600},
+P:{rwx:118,rwy:118,lwx:48,lwy:175,rFing:HHND,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'P',dur:600},
+Q:{rwx:125,rwy:118,lwx:48,lwy:175,rFing:POINT,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Q',dur:600},
+R:{rwx:118,rwy:108,lwx:48,lwy:175,rFing:{i:0,m:0,r:1,p:1,t:0.5},lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'R',dur:600},
+S:{rwx:118,rwy:108,lwx:48,lwy:175,rFing:FIST,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'S',dur:600},
+T:{rwx:118,rwy:108,lwx:48,lwy:175,rFing:{i:1,m:0.8,r:1,p:1,t:0.2},lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'T',dur:600},
+U:{rwx:118,rwy:108,lwx:48,lwy:175,rFing:{i:0,m:0,r:1,p:1,t:0.5},lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'U',dur:600},
+V:{rwx:118,rwy:108,lwx:48,lwy:175,rFing:PEACE,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'V',dur:600},
+W:{rwx:118,rwy:108,lwx:48,lwy:175,rFing:THREE,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'W',dur:600},
+X:{rwx:118,rwy:108,lwx:48,lwy:175,rFing:HOOK,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'X',dur:600},
+Y:{rwx:118,rwy:108,lwx:48,lwy:175,rFing:YHND,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Y',dur:600},
+Z:{rwx:125,rwy:108,lwx:48,lwy:175,rFing:POINT,lFing:FIST,expr:'neutral',headTilt:0,lipsOpen:0,desc:'Z',dur:700},
+};
+
+function setSign(key){
+  // If key has no SIGNS entry (e.g. phrase-video tokens like HOW_ARE_YOU),
+  // fall back to NEUTRAL so the avatar never freezes/disappears
+  const s = key ? (SIGNS[key] || null) : null;
+
+  // Fully normalise cur before snapshotting as fromPose so no field is undefined
+  const FIELDS = {rWristRot:0,lWristRot:0,rShoulderY:0,lShoulderY:0,
+                  headNod:0,browRaise:0,cheekPuff:0,headTilt:0,lipsOpen:0,
+                  _rwave:false,_lwave:false,_rshake:false,_rcirc:false,_rnod:false};
+  for(const [k,v] of Object.entries(FIELDS)){
+    if(cur[k]===undefined || cur[k]===null) cur[k]=v;
+  }
+  if(!cur.rFing) cur.rFing={i:0,m:0,r:0,p:0,t:0};
+  if(!cur.lFing) cur.lFing={i:0,m:0,r:0,p:0,t:0};
+
+  const fromPose = deepCopy(cur);
+  const durMs = s ? (s.dur||1000) : 400;
+  const frames = buildKeyframes(fromPose, s, durMs / spd);
+  playKeyframes(frames);
+  frameT = 0;
+}
+
+// ════════════════════════════════════════════════════════
+//  VIEW MODE SYSTEM
+//  'avatar' = canvas only
+//  'video'  = video only (with "no video" fallback)
+//  'both'   = side by side
+// ════════════════════════════════════════════════════════
+let viewMode = 'avatar'; // default
+
+function setViewMode(mode){
+  viewMode = mode;
+  // Update button states
+  document.getElementById('vm-avatar').classList.toggle('active', mode==='avatar');
+  document.getElementById('vm-video').classList.toggle('active', mode==='video');
+  document.getElementById('vm-both').classList.toggle('active', mode==='both');
+
+  const single = document.getElementById('stageSingle');
+  const left   = document.getElementById('stageLeft');
+  const right  = document.getElementById('stageRight');
+  const cvEl   = document.getElementById('cv');
+
+  if(mode === 'both'){
+    single.style.display = 'none';
+    left.style.display   = 'flex';
+    right.style.display  = 'flex';
+    document.getElementById('vmInfo').textContent = 'Video on left • Avatar on right';
+    resize();
+  } else {
+    single.style.display = 'flex';
+    left.style.display   = 'none';
+    right.style.display  = 'none';
+    if(mode === 'avatar'){
+      cvEl.style.display = 'block';
+      cvEl.style.opacity = '1';
+      islVid.style.display = 'none';
+      document.getElementById('vidBadge').style.display = 'none';
+      document.getElementById('noVidMsg').style.display = 'none';
+      document.getElementById('vmInfo').textContent = 'Avatar signs all words — every word, every time';
+    } else {
+      // video mode: canvas stays rendered (avatar visible), video overlays when playing
+      cvEl.style.display = 'block';
+      cvEl.style.opacity = '1';
+      document.getElementById('vmInfo').textContent = 'Video when available • Avatar signs when no video';
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  VIDEO ROUTER
+//  ── HOW TO ADD VIDEOS ──────────────────────────────────
+//  1. If you are serving this page from Flask, videos are served from /static/signs/videos/
+//  2. If you are opening this HTML directly from disk, the page computes the backend static path.
+//  3. Add an entry to VIDEO_MAP below:
+//     'SIGN_KEY': 'your-file-name.mp4'
+//  4. Save and reload — it auto-integrates!
+//
+//  For PHRASE VIDEOS (one video for multiple words):
+//  Add to PHRASE_VIDEO_MAP:
+//     'WORD1,WORD2,WORD3': 'PHRASE_TOKEN'
+//  And add to VIDEO_MAP:
+//     'PHRASE_TOKEN': 'phrase-video.mp4'
+// ═══════════════════════════════════════════════════════
+
+const VIDEO_BASE_HTTP = '/static/signs/Videos_avatar/';
+
+function getLocalVideoBase() {
+  const pathname = window.location.pathname.replace(/\\/g, '/');
+  const parts = pathname.split('/');
+  if (parts.lastIndexOf('shared') !== -1) return '../../avatar%20vedios/';
+  if (parts.lastIndexOf('public') !== -1) return '../../../avatar%20vedios/';
+  return '../../avatar%20vedios/';
+}
+
+function resolveVideoSrc(src) {
+  if (!src) return src;
+  if (/^(?:https?:|file:|\/)/.test(src)) return src;
+  return window.location.protocol === 'file:' ? getLocalVideoBase() + src : VIDEO_BASE_HTTP + src;
+}
+
+const VIDEO_MAP = {
+  // ── Available avatar vedios folder files ─────────────
+  'THANK_YOU':        'thank-you.mp4',
+  'I_FINE':           'I-am-fine-.mp4',
+  'FINE':             'I-am-fine-.mp4',
+  'NEED_HELP':        'i-need-your-help.mp4',
+  'NICE_MEET_YOU':    'nice-to-meet-you-.mp4',
+  'WATER':            'water.mp4',
+  'YES':              'yes.mp4',
+  'NO':               'No.mp4',
+  'NAME':             'my_name.mp4',
+  'WHAT_YOUR_NAME':   'my_name.mp4',
+  'I_LOVE_YOU':       'I_Love_You.mp4',
+  // ── Add your new video entries below this line ────
+  // Example: 'I_NEED_HELP':  'i-need-your-help.mp4',
+  // Example: 'GOOD_MORNING': 'good-morning.mp4',
+};
+
+const PHRASE_VIDEO_MAP = {
+  'HELLO,HOW,ARE,YOU':    'HOW_ARE_YOU',
+  'HI,HOW,ARE,YOU':       'HOW_ARE_YOU',
+  'I,FINE':               'I_FINE',
+  'PLEASE,HELP,I':        'NEED_HELP',
+  'HELP,I':               'NEED_HELP',
+  'NICE,MEET,YOU':        'NICE_MEET_YOU',
+  'WHAT,YOUR,NAME':       'WHAT_YOUR_NAME',
+  // ── Add phrase mappings below ─────────────────────
+};
+
+function collapseToVideoPhrase(glossArr) {
+  const key = glossArr.join(',');
+  if (PHRASE_VIDEO_MAP[key]) return [PHRASE_VIDEO_MAP[key]];
+  for (let len = Math.min(glossArr.length, 5); len >= 2; len--) {
+    const sub = glossArr.slice(0, len).join(',');
+    if (PHRASE_VIDEO_MAP[sub]) {
+      return [PHRASE_VIDEO_MAP[sub], ...glossArr.slice(len)];
+    }
+  }
+  return glossArr;
+}
+
+let vidQueue = [], vidIdx = 0, vidPlaying = false;
+const islVid = document.getElementById('islVideo');
+const islVidSplit = document.getElementById('islVideoSplit');
+
+function hasVideo(token) {
+  return !!VIDEO_MAP[token];
+}
+
+// Show/hide video vs canvas (single mode)
+function showVideoLayer(on, token){
+  const cvEl = document.getElementById('cv');
+  const badge = document.getElementById('vidBadge');
+  const noVid = document.getElementById('noVidMsg');
+
+  if(viewMode === 'avatar'){
+    // Always show avatar canvas, never video
+    islVid.style.display = 'none';
+    cvEl.style.display = 'block';
+    cvEl.style.opacity = '1';
+    badge.style.display = 'none';
+    noVid.style.display = 'none';
+    return;
+  }
+  if(viewMode === 'video'){
+    if(on && token && hasVideo(token)){
+      islVid.style.display = 'block';
+      cvEl.style.opacity = '0.0';
+      badge.style.display = 'flex';
+      noVid.style.display = 'none';
+    } else if(!on){
+      // Between signs: show avatar canvas
+      islVid.style.display = 'none';
+      cvEl.style.display = 'block';
+      cvEl.style.opacity = '1';
+      badge.style.display = 'none';
+      noVid.style.display = 'none';
+    } else {
+      // No video available for this word — avatar signs it
+      islVid.style.display = 'none';
+      cvEl.style.display = 'block';
+      cvEl.style.opacity = '1';
+      badge.style.display = 'none';
+      noVid.style.display = 'none';
+    }
+  }
+  if(viewMode === 'both'){
+    // Handled separately via split canvases
+  }
+}
+
+function playVideoSign(token, onDone) {
+  const src = resolveVideoSrc(VIDEO_MAP[token]);
+
+  if(viewMode === 'both'){
+    // Play in the split left panel
+    const noVidSplit = document.getElementById('noVidMsgSplit');
+    const vidBadgeSplit = document.getElementById('vidBadgeSplit');
+    if(!src){
+      noVidSplit.style.display = 'flex';
+      vidBadgeSplit.style.display = 'none';
+      setTimeout(onDone, 800);
+      return;
+    }
+    noVidSplit.style.display = 'none';
+    vidBadgeSplit.style.display = 'flex';
+    islVidSplit.style.display = 'block';
+    islVidSplit.src = src;
+    islVidSplit.playbackRate = spd;
+    islVidSplit.onended = () => { islVidSplit.style.display='none'; vidBadgeSplit.style.display='none'; onDone(); };
+    islVidSplit.onerror = () => { islVidSplit.style.display='none'; noVidSplit.style.display='flex'; onDone(); };
+    islVidSplit.play().catch(() => { islVidSplit.style.display='none'; onDone(); });
+    return;
+  }
+
+  if(!src){
+    showVideoLayer(false, token);
+    onDone();
+    return;
+  }
+
+  if(viewMode === 'video'){
+    showVideoLayer(true, token);
+    islVid.src = src;
+    islVid.playbackRate = spd;
+    islVid.onended = () => { showVideoLayer(false); onDone(); };
+    islVid.onerror = () => { showVideoLayer(false); onDone(); };
+    islVid.play().catch(() => { showVideoLayer(false); onDone(); });
+    return;
+  }
+
+  // avatar mode: skip video, just run avatar
+  onDone();
+}
+
+// ════════════════════════════════════════════════════════
+//  PHRASE LIBRARY
+// ════════════════════════════════════════════════════════
+const SP={en:{
+'hello':['HELLO'],'hi how are you':['HI','HOW','ARE','YOU'],'hi, how are you?':['HI','HOW','ARE','YOU'],
+'i am fine':['I','FINE'],'thank you':['THANK_YOU'],"you're welcome":['WELCOME'],
+'please help me':['PLEASE','HELP','I'],'excuse me':['EXCUSE'],'sorry':['SORRY'],
+'nice to meet you':['NICE','MEET','YOU'],'goodbye':['GOODBYE'],
+'what is your name?':['WHAT','YOUR','NAME'],'what is your name':['WHAT','YOUR','NAME'],
+'how old are you?':['HOW','AGE','YOU'],'how old are you':['HOW','AGE','YOU'],
+'where are you from?':['WHERE','YOU','FROM'],'where are you from':['WHERE','YOU','FROM'],
+'what are you doing?':['WHAT','YOU','DOING'],'what are you doing':['WHAT','YOU','DOING'],
+'i am working':['I','WORK'],'i am studying':['I','STUDY'],
+"i don't understand":['I','NOT','UNDERSTAND'],
+'can you repeat that?':['REPEAT'],'can you repeat that':['REPEAT'],
+'speak slowly':['SPEAK','SLOW'],
+'i am hungry':['I','HUNGRY'],'i am thirsty':['I','THIRSTY'],'i am tired':['I','TIRED'],
+'i need water':['I','NEED','WATER'],"let's go":['GO'],
+'come here':['COME','HERE'],'wait for me':['WAIT','I'],
+'i am going home':['I','GO','HOME'],'i will be late':['I','LATE'],
+'call me later':['CALL','I','LATER'],
+'where is the restroom?':['WHERE','RESTROOM'],'where is the restroom':['WHERE','RESTROOM'],
+'where is the bathroom?':['WHERE','RESTROOM'],'where is the toilet':['WHERE','RESTROOM'],
+'where are you going?':['WHERE','YOU','GO'],'where are you going':['WHERE','YOU','GO'],
+'what time is it?':['WHAT','TIME'],'what time is it':['WHAT','TIME'],
+'can you help me?':['HELP','I'],'can you help me':['HELP','I'],
+'what happened?':['WHAT','HAPPEN'],'what happened':['WHAT','HAPPEN'],
+'are you okay?':['YOU','OKAY'],'are you okay':['YOU','OKAY'],
+'do you need help?':['YOU','NEED','HELP'],'do you need help':['YOU','NEED','HELP'],
+'i need assistance':['I','NEED','ASSISTANCE'],
+'please call the doctor':['PLEASE','CALL','DOCTOR'],
+"it's an emergency":['EMERGENCY'],"it is an emergency":['EMERGENCY'],
+'i like this':['I','LIKE','THIS'],"i don't like this":['I','NOT','LIKE','THIS'],
+"that's good":['THAT','GOOD'],'that is good':['THAT','GOOD'],
+"that's bad":['THAT','BAD'],'that is bad':['THAT','BAD'],
+'i agree':['I','AGREE'],'i disagree':['I','DISAGREE'],
+'no problem':['NO_PROBLEM'],'of course':['OF_COURSE'],'maybe':['MAYBE'],
+'see you later':['SEE','YOU','LATER'],
+'i need help':['I','NEED','HELP'],
+'i want water':['I','WANT','WATER'],
+'good morning':['GOOD'],
+'good night':['GOOD'],
+'yes':['YES'],'no':['NO'],
+},
+hi:{'नमस्ते':['NAMASTE'],'आप कैसे हैं':['HOW','ARE','YOU'],'मैं ठीक हूँ':['I','FINE'],'धन्यवाद':['THANK_YOU'],'आपका स्वागत है':['WELCOME'],'कृपया मेरी मदद करें':['PLEASE','HELP','I'],'माफ़ कीजिए':['EXCUSE'],'माफ़ी':['SORRY'],'मिलकर अच्छा लगा':['NICE','MEET','YOU'],'अलविदा':['GOODBYE'],'आपका नाम क्या है':['WHAT','YOUR','NAME'],'मुझे पानी चाहिए':['I','NEED','WATER'],'मैं भूखा हूँ':['I','HUNGRY'],'मैं प्यासा हूँ':['I','THIRSTY'],'मैं थका हुआ हूँ':['I','TIRED'],'मदद करें':['HELP'],'शौचालय कहाँ है':['WHERE','RESTROOM'],'डॉक्टर को बुलाओ':['CALL','DOCTOR'],'आपातकाल है':['EMERGENCY'],'बाद में मिलेंगे':['SEE','YOU','LATER'],'मुझे मदद चाहिए':['I','NEED','HELP']},
+te:{'నమస్కారం':['NAMASTE'],'మీరు ఎలా ఉన్నారు':['HOW','ARE','YOU'],'నేను బాగున్నాను':['I','FINE'],'ధన్యవాదాలు':['THANK_YOU'],'స్వాగతం':['WELCOME'],'దయచేసి నాకు సహాయం చేయండి':['PLEASE','HELP','I'],'క్షమించండి':['SORRY'],'నాకు నీళ్ళు కావాలి':['I','NEED','WATER'],'నాకు ఆకలిగా ఉంది':['I','HUNGRY'],'నాకు దాహంగా ఉంది':['I','THIRSTY'],'మీ పేరు ఏమిటి':['WHAT','YOUR','NAME'],'సహాయం చేయండి':['HELP'],'టాయిలెట్ ఎక్కడ':['WHERE','RESTROOM'],'వైద్యుడిని పిలవండి':['CALL','DOCTOR'],'అత్యవసర పరిస్థితి':['EMERGENCY'],'తర్వాత కలుద్దాం':['SEE','YOU','LATER']},
+ta:{'வணக்கம்':['NAMASTE'],'நீங்கள் எப்படி இருக்கிறீர்கள்':['HOW','ARE','YOU'],'நான் நலமாக இருக்கிறேன்':['I','FINE'],'நன்றி':['THANK_YOU'],'வரவேற்கிறேன்':['WELCOME'],'தயவுசெய்து உதவுங்கள்':['PLEASE','HELP','I'],'மன்னிக்கவும்':['SORRY'],'எனக்கு தண்ணீர் வேண்டும்':['I','NEED','WATER'],'எனக்கு பசி':['I','HUNGRY'],'உங்கள் பெயர் என்ன':['WHAT','YOUR','NAME'],'கழிவறை எங்கே':['WHERE','RESTROOM'],'டாக்டரை அழையுங்கள்':['CALL','DOCTOR'],'அவசரநிலை':['EMERGENCY'],'பின்னர் சந்திப்போம்':['SEE','YOU','LATER']},
+ml:{'നമസ്കാരം':['NAMASTE'],'നിങ്ങൾ എങ്ങനെ ഉണ്ട്':['HOW','ARE','YOU'],'ഞാൻ സുഖമായിരിക്കുന്നു':['I','FINE'],'നന്ദി':['THANK_YOU'],'സ്വാഗതം':['WELCOME'],'ദയവായി സഹായിക്കൂ':['PLEASE','HELP','I'],'ക്ഷമിക്കണം':['SORRY'],'എനിക്ക് വെള്ളം വേണം':['I','NEED','WATER'],'എനിക്ക് വിശക്കുന്നു':['I','HUNGRY'],'നിങ്ങളുടെ പേര് എന്ത്':['WHAT','YOUR','NAME'],'ടോയ്‌ലറ്റ് എവിടെ':['WHERE','RESTROOM'],'ഡോക്ടറെ വിളിക്കൂ':['CALL','DOCTOR'],'അടിയന്തിരം':['EMERGENCY'],'പിന്നീട് കാണാം':['SEE','YOU','LATER']},
+kn:{'ನಮಸ್ಕಾರ':['NAMASTE'],'ನೀವು ಹೇಗಿದ್ದೀರಿ':['HOW','ARE','YOU'],'ನಾನು ಚೆನ್ನಾಗಿದ್ದೇನೆ':['I','FINE'],'ಧನ್ಯವಾದ':['THANK_YOU'],'ಸ್ವಾಗತ':['WELCOME'],'ದಯವಿಟ್ಟು ಸಹಾಯ ಮಾಡಿ':['PLEASE','HELP','I'],'ಕ್ಷಮಿಸಿ':['SORRY'],'ನನಗೆ ನೀರು ಬೇಕು':['I','NEED','WATER'],'ನನಗೆ ಹಸಿವಾಗಿದೆ':['I','HUNGRY'],'ನಿಮ್ಮ ಹೆಸರೇನು':['WHAT','YOUR','NAME'],'ಶೌಚಾಲಯ ಎಲ್ಲಿ':['WHERE','RESTROOM'],'ವೈದ್ಯರನ್ನು ಕರೆಯಿರಿ':['CALL','DOCTOR'],'ತುರ್ತು ಪರಿಸ್ಥಿತಿ':['EMERGENCY'],'ನಂತರ ಭೇಟಿಯಾಗೋಣ':['SEE','YOU','LATER']},
+bn:{'নমস্কার':['NAMASTE'],'আপনি কেমন আছেন':['HOW','ARE','YOU'],'আমি ভালো আছি':['I','FINE'],'ধন্যবাদ':['THANK_YOU'],'স্বাগতম':['WELCOME'],'দয়া করে সাহায্য করুন':['PLEASE','HELP','I'],'ক্ষমা করবেন':['SORRY'],'আমার পানি দরকার':['I','NEED','WATER'],'আমি ক্ষুধার্ত':['I','HUNGRY'],'আপনার নাম কি':['WHAT','YOUR','NAME'],'টয়লেট কোথায়':['WHERE','RESTROOM'],'ডাক্তার ডাকুন':['CALL','DOCTOR'],'জরুরি অবস্থা':['EMERGENCY'],'পরে দেখা হবে':['SEE','YOU','LATER']},
+mr:{'नमस्ते':['NAMASTE'],'तुम्ही कसे आहात':['HOW','ARE','YOU'],'मी ठीक आहे':['I','FINE'],'धन्यवाद':['THANK_YOU'],'कृपया मला मदद करा':['PLEASE','HELP','I'],'माफ करा':['SORRY'],'मला पाणी हवे':['I','NEED','WATER'],'मला भूक लागली आहे':['I','HUNGRY'],'डॉक्टरांना बोलवा':['CALL','DOCTOR'],'आपत्कालीन परिस्थिती':['EMERGENCY'],'नंतर भेटू':['SEE','YOU','LATER']},
+gu:{'નમસ્તે':['NAMASTE'],'તમે કેવા છો':['HOW','ARE','YOU'],'હું ઠીક છું':['I','FINE'],'આભાર':['THANK_YOU'],'કૃપા કરીને મદદ કરો':['PLEASE','HELP','I'],'માફ કરો':['SORRY'],'મને પાણી જોઈએ':['I','NEED','WATER'],'મને ભૂખ લાગી છે':['I','HUNGRY'],'ડૉક્ટરને બોલાવો':['CALL','DOCTOR'],'કટોકટી':['EMERGENCY']},
+pa:{'ਸਤ ਸ੍ਰੀ ਅਕਾਲ':['NAMASTE'],'ਤੁਸੀਂ ਕਿਵੇਂ ਹੋ':['HOW','ARE','YOU'],'ਮੈਂ ਠੀਕ ਹਾਂ':['I','FINE'],'ਧੰਨਵਾਦ':['THANK_YOU'],'ਕਿਰਪਾ ਕਰਕੇ ਮਦਦ ਕਰੋ':['PLEASE','HELP','I'],'ਮਾਫ਼ ਕਰੋ':['SORRY'],'ਮੈਨੂੰ ਪਾਣੀ ਚਾਹੀਦਾ ਹੈ':['I','NEED','WATER'],'ਡਾਕਟਰ ਨੂੰ ਬੁਲਾਓ':['CALL','DOCTOR'],'ਐਮਰਜੈਂਸੀ':['EMERGENCY']},
+};
+
+const WM={en:{hello:['HELLO'],namaste:['NAMASTE'],hi:['HI'],how:['HOW'],are:['ARE'],you:['YOU'],i:['I'],me:['I'],my:['MY'],we:['WE'],name:['NAME'],need:['NEED'],want:['WANT'],water:['WATER'],good:['GOOD'],bad:['BAD'],please:['PLEASE'],thank:['THANK_YOU'],thanks:['THANK_YOU'],help:['HELP'],yes:['YES'],no:['NO'],what:['WHAT'],where:['WHERE'],fine:['FINE'],okay:['OKAY'],ok:['OKAY'],sorry:['SORRY'],welcome:['WELCOME'],call:['CALL'],doctor:['DOCTOR'],emergency:['EMERGENCY'],maybe:['MAYBE'],agree:['AGREE'],disagree:['DISAGREE'],hungry:['HUNGRY'],thirsty:['THIRSTY'],tired:['TIRED'],home:['HOME'],go:['GO'],come:['COME'],here:['HERE'],wait:['WAIT'],late:['LATE'],work:['WORK'],study:['STUDY'],understand:['UNDERSTAND'],not:['NOT'],repeat:['REPEAT'],slow:['SLOW'],speak:['SPEAK'],like:['LIKE'],see:['SEE'],meet:['MEET'],time:['TIME'],this:['THIS'],that:['THAT'],happen:['HAPPEN'],assistance:['ASSISTANCE'],restroom:['RESTROOM'],toilet:['RESTROOM'],bathroom:['RESTROOM'],from:['FROM'],age:['AGE'],doing:['DOING'],later:['LATER'],goodbye:['GOODBYE'],bye:['GOODBYE'],nice:['NICE'],excuse:['EXCUSE'],your:['YOUR'],problem:['NO_PROBLEM'],course:['OF_COURSE']}};
+
+// ════════════════════════════════════════════════════════
+//  PLAYBACK ENGINE
+// ════════════════════════════════════════════════════════
+let lang='auto', queue=[], avatarQueue=[], qi=0, spd=1, rep=false, stm=null, listening=false, recog=null;
+// avatarQueue: word-by-word gloss (always used for avatar, has a SIGNS entry for every token)
+// queue: video-collapsed gloss (used for video/both mode video side)
+
+// ════════════════════════════════════════════════════════
+//  NLP — IMPROVED TRANSLATION WITH AUTO-DETECT
+// ════════════════════════════════════════════════════════
+const ISL_STOP = new Set(['the','a','an','is','are','was','were','am','be','been','being','of','in','on','at','to','for','with','by','from','it','its','this','these','those']);
+
+const STEM_MAP = {
+  hungry:'HUNGRY', hunger:'HUNGRY',
+  thirsty:'THIRSTY', thirst:'THIRSTY',
+  tired:'TIRED', exhausted:'TIRED', fatigue:'TIRED',
+  help:'HELP', helping:'HELP', helped:'HELP',
+  need:'NEED', needs:'NEED', needed:'NEED', needing:'NEED',
+  want:'WANT', wants:'WANT', wanted:'WANT',
+  go:'GO', going:'GO', goes:'GO', went:'GO',
+  come:'COME', coming:'COME', came:'COME',
+  understand:'UNDERSTAND', understood:'UNDERSTAND',
+  thanks:'THANK_YOU', thank:'THANK_YOU',
+  sorry:'SORRY', apologize:'SORRY', apology:'SORRY',
+  restroom:'RESTROOM', bathroom:'RESTROOM', toilet:'RESTROOM', washroom:'RESTROOM',
+  emergency:'EMERGENCY', urgent:'EMERGENCY',
+  goodbye:'GOODBYE', bye:'GOODBYE', farewell:'GOODBYE',
+  hello:'HELLO', hi:'HI', hey:'HI',
+  fine:'FINE', okay:'OKAY', ok:'OKAY', good:'GOOD',
+  bad:'BAD', wrong:'BAD',
+  name:'NAME', called:'NAME',
+  water:'WATER', drink:'WATER',
+  doctor:'DOCTOR', hospital:'DOCTOR',
+  call:'CALL', phone:'CALL',
+  wait:'WAIT', waiting:'WAIT',
+  late:'LATE', delayed:'LATE',
+  home:'HOME', house:'HOME',
+  time:'TIME', clock:'TIME',
+  repeat:'REPEAT', again:'REPEAT',
+  slow:'SLOW', slowly:'SLOW',
+  speak:'SPEAK', talk:'SPEAK', say:'SPEAK',
+  like:'LIKE', love:'LIKE', enjoy:'LIKE',
+  agree:'AGREE', yes:'YES', correct:'YES',
+  disagree:'DISAGREE', no:'NO',
+  meet:'MEET', met:'MEET',
+  nice:'NICE', great:'NICE', wonderful:'NICE',
+  work:'WORK', working:'WORK', job:'WORK',
+  study:'STUDY', studying:'STUDY', learn:'STUDY',
+  maybe:'MAYBE', perhaps:'MAYBE',
+};
+
+function reorderToISL(words){
+  const WH = new Set(['what','where','who','how','when','why','which']);
+  const VERBS = new Set(['go','come','help','need','want','call','speak','understand','work','study','like','agree','disagree','see','meet','repeat']);
+  const subjects=[], objects=[], verbs=[], wh=[];
+  for(const w of words){
+    if(WH.has(w)) wh.push(w);
+    else if(VERBS.has(w)) verbs.push(w);
+    else subjects.push(w);
+  }
+  if(wh.length) return [...wh,...subjects,...verbs];
+  return [...subjects,...objects,...verbs];
+}
+
+// Auto-detect language from text characteristics
+function detectLanguage(text){
+  const devanagari = /[\u0900-\u097F]/;
+  const telugu     = /[\u0C00-\u0C7F]/;
+  const tamil      = /[\u0B80-\u0BFF]/;
+  const malayalam  = /[\u0D00-\u0D7F]/;
+  const kannada    = /[\u0C80-\u0CFF]/;
+  const bengali    = /[\u0980-\u09FF]/;
+  const gujarati   = /[\u0A80-\u0AFF]/;
+  const gurmukhi   = /[\u0A00-\u0A7F]/; // Punjabi
+  const arabic     = /[\u0600-\u06FF]/;  // Urdu
+  const oriya      = /[\u0B00-\u0B7F]/;
+  if(telugu.test(text)) return 'te';
+  if(tamil.test(text)) return 'ta';
+  if(malayalam.test(text)) return 'ml';
+  if(kannada.test(text)) return 'kn';
+  if(bengali.test(text)) return 'bn';
+  if(gujarati.test(text)) return 'gu';
+  if(gurmukhi.test(text)) return 'pa';
+  if(arabic.test(text)) return 'ur';
+  if(oriya.test(text)) return 'or';
+  if(devanagari.test(text)) return 'hi'; // Hindi/Marathi — default devanagari to Hindi
+  return 'en';
+}
+
+async function translateToEnglish(text, srcLang){
+  if(srcLang === 'en') return text;
+  try {
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${srcLang}|en`;
+    const r = await fetch(url);
+    const d = await r.json();
+    if(d.responseStatus === 200 && d.responseData?.translatedText){
+      return d.responseData.translatedText;
+    }
+  } catch(e){}
+  return text;
+}
+
+async function textToGlossAsync(txt){
+  const lower = txt.toLowerCase().replace(/[।\.!?,;।]/g,'').trim();
+
+  // Determine effective language
+  let effectiveLang = lang;
+  if(lang === 'auto'){
+    effectiveLang = detectLanguage(txt);
+    // Show detection badge
+    const names = {en:'English',hi:'Hindi',te:'Telugu',ta:'Tamil',ml:'Malayalam',kn:'Kannada',bn:'Bengali',gu:'Gujarati',pa:'Punjabi',mr:'Marathi',ur:'Urdu',or:'Odia'};
+    const det = document.getElementById('detectedLang');
+    det.textContent = '✦ ' + (names[effectiveLang] || 'English') + ' detected';
+    det.style.display = 'inline-block';
+    setTimeout(()=>{ det.style.display='none'; }, 4000);
+  }
+
+  // 1. Check phrase dictionary in the effective language
+  const sm = SP[effectiveLang] || SP.en;
+  if(sm[lower]) return sm[lower];
+  if(SP.en[lower]) return SP.en[lower];
+
+  // 2. Translate non-English to English
+  let english = lower;
+  if(effectiveLang !== 'en'){
+    english = (await translateToEnglish(txt, effectiveLang)).toLowerCase().replace(/[।\.!?,;।]/g,'').trim();
+    if(SP.en[english]) return SP.en[english];
+    if(sm[english]) return sm[english];
+  }
+
+  // 3. Word-level processing with ISL grammar
+  const wm = WM.en;
+  const rawWords = english.split(/\s+/);
+  const contentWords = rawWords.filter(w => !ISL_STOP.has(w) && w.length > 0);
+  const reordered = reorderToISL(contentWords);
+
+  const out = [];
+  let i = 0;
+  while(i < reordered.length){
+    const w = reordered[i];
+    const bi = w + ' ' + reordered[i+1];
+    if(i+1 < reordered.length && SP.en[bi]){
+      out.push(...SP.en[bi]); i += 2;
+    } else if(STEM_MAP[w]){
+      out.push(STEM_MAP[w]); i++;
+    } else if(wm[w]){
+      out.push(...wm[w]); i++;
+    } else if(w.length > 0){
+      w.toUpperCase().split('').forEach(c=>{ if(SIGNS[c]) out.push(c); });
+      i++;
+    } else i++;
+  }
+  return out;
+}
+
+function textToGloss(txt){
+  const lower = txt.toLowerCase().replace(/[।\.!?,;।]/g,'').trim();
+  const sm = SP[lang]||SP.en;
+  if(sm[lower]) return sm[lower];
+  const wm = WM[lang]||WM.en;
+  const words = lower.split(/\s+/);
+  let out=[], i=0;
+  while(i<words.length){
+    const bi=words[i]+' '+words[i+1];
+    if(i+1<words.length&&sm[bi]){out.push(...sm[bi]);i+=2;}
+    else if(wm[words[i]]){out.push(...wm[words[i]]);i++;}
+    else if(words[i].length>0){words[i].toUpperCase().split('').forEach(c=>{if(SIGNS[c])out.push(c);});i++;}
+    else i++;
+  }
+  return out;
+}
+
+function startQ(){
+  if(stm) clearTimeout(stm);
+  document.getElementById('sbadge').classList.add('on');
+  document.getElementById('sbadge').textContent='Signing…';
+  showNext();
+}
+function stopQ(){
+  if(stm) clearTimeout(stm);
+  queue=[]; avatarQueue=[];
+  document.getElementById('sbadge').classList.remove('on');
+  document.getElementById('sbadge').textContent='Waiting for input';
+  document.getElementById('sw').classList.remove('vis');
+  document.getElementById('swSplit').classList.remove('vis');
+  document.getElementById('pf').style.width='0%';
+  document.getElementById('scnt').textContent='— signs';
+  if(!islVid.paused){ islVid.pause(); islVid.src=''; }
+  if(!islVidSplit.paused){ islVidSplit.pause(); islVidSplit.src=''; }
+  showVideoLayer(false);
+  document.getElementById('noVidMsgSplit').style.display='none';
+  setSign(null);
+}
+
+function showNext(){
+  // avatarQueue drives timing in all modes; queue drives video in video/both modes
+  const activeQueue = avatarQueue.length ? avatarQueue : queue;
+  if(qi >= activeQueue.length){
+    if(rep){qi=0;showNext();}
+    else setTimeout(stopQ,800);
+    return;
+  }
+
+  // --- Avatar token (always has a SIGNS entry) ---
+  const avatarKey = activeQueue[qi];
+  const sd = SIGNS[avatarKey];
+
+  // --- Video token: find the matching video-queue entry for this position ---
+  // We map avatar index to video queue by walking through video tokens that
+  // "cover" the same words. Simple approach: use the same index clamped.
+  const vidKey = queue[Math.min(qi, queue.length-1)];
+
+  // Update current word display
+  const sw = document.getElementById('sw');
+  const swS = document.getElementById('swSplit');
+  sw.classList.remove('vis'); swS.classList.remove('vis');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const label = avatarKey.replace(/_/g,' ');
+    sw.textContent = label; sw.classList.add('vis');
+    swS.textContent = label; swS.classList.add('vis');
+  }));
+
+  const hasVid = hasVideo(vidKey);
+  const descText = (viewMode==='video'||viewMode==='both') && hasVid
+    ? '▶ ISLRTC video'
+    : ((sd&&sd.desc) ? sd.desc : (avatarKey.length===1 ? 'Fingerspell '+avatarKey : 'Sign: '+avatarKey));
+  document.getElementById('ss').textContent = descText;
+  document.getElementById('ssSplit').textContent = descText;
+  document.getElementById('pf').style.width=((qi+1)/activeQueue.length*100)+'%';
+  document.querySelectorAll('.gtok').forEach((t,i)=>t.classList.toggle('active',i===qi));
+  qi++;
+
+  // Always run avatar animation — every word, every mode
+  setSign(avatarKey);
+  const dur = (sd ? sd.dur : 800) / spd;
+
+  if(viewMode === 'avatar'){
+    // Avatar only — ignore video entirely
+    stm = setTimeout(showNext, dur + 60/spd);
+
+  } else if(viewMode === 'video'){
+    // Video drives timing; avatar also signs (canvas visible behind/alongside)
+    if(hasVid){
+      // Show video, avatar animates underneath (opacity kept, canvas shown)
+      playVideoSign(vidKey, ()=>{ stm=setTimeout(showNext, 120/spd); });
+    } else {
+      // No video: avatar signs, show "no video" message
+      showVideoLayer(false, vidKey);
+      stm = setTimeout(showNext, dur + 60/spd);
+    }
+
+  } else {
+    // both mode — avatar always signs on right, video plays on left when available
+    // Video is fire-and-forget; avatar timing drives advancement
+    if(hasVid){
+      playVideoSign(vidKey, ()=>{}); // fire-and-forget on left panel
+    } else {
+      // Show "no video" placeholder on left panel
+      const noVidSplit = document.getElementById('noVidMsgSplit');
+      const vidBadgeSplit = document.getElementById('vidBadgeSplit');
+      if(noVidSplit) noVidSplit.style.display = 'flex';
+      if(vidBadgeSplit) vidBadgeSplit.style.display = 'none';
+      // Clear after current sign duration
+      setTimeout(()=>{
+        if(noVidSplit) noVidSplit.style.display = 'none';
+      }, dur);
+    }
+    stm = setTimeout(showNext, dur + 60/spd); // avatar drives timing
+  }
+}
+
+async function translate(){
+  const txt = document.getElementById('tin').value.trim();
+  if(!txt) return;
+  stopQ();
+
+  const btn = document.getElementById('translateBtn');
+  btn.disabled = true;
+  const statusEl = document.getElementById('transStatus');
+  statusEl.style.display='inline-block';
+  statusEl.textContent='AI Translating…';
+
+  let g;
+  try {
+    // Try Claude API first for intelligent ISL gloss generation
+    try {
+      g = await translateWithClaude(txt);
+      if(!g || g.length === 0) throw new Error('No gloss from Claude');
+    } catch(e) {
+      // Fallback to local translation
+      try {
+        g = await textToGlossAsync(txt);
+      } catch(e2) {
+        g = textToGloss(txt);
+      }
+    }
+  } finally {
+    statusEl.style.display='none';
+    btn.disabled = false;
+  }
+
+  // Build the raw word-by-word gloss (used for avatar in ALL modes)
+  const rawGloss = [...g];
+
+  // Build video-collapsed gloss (phrase tokens like HOW_ARE_YOU — used only for video lookup)
+  const videoGloss = collapseToVideoPhrase(g);
+
+  // avatarQueue: always use raw word-by-word so avatar has a SIGNS entry for every token
+  // queue: video-collapsed version (may contain phrase tokens without SIGNS entries)
+  avatarQueue = rawGloss;
+  queue = videoGloss;
+
+  if(!rawGloss.length){
+    document.getElementById('glossEl').innerHTML='<span class="glabel">ISL Gloss</span><span style="font-size:11px;color:var(--text3);font-style:italic">No signs found — try a phrase from the quick list</span>';
+    return;
+  }
+  const el=document.getElementById('glossEl');
+  el.innerHTML='<span class="glabel">ISL Gloss</span>';
+  rawGloss.forEach((t,i)=>{
+    const s=document.createElement('span');
+    const isVid=hasVideo(t);
+    s.className='gtok'+(t.length===1?' fi':'')+(isVid?' vid':'');
+    if(isVid) s.title='Video available ▶';
+    s.textContent=t.replace(/_/g,' ')+(isVid?' ▶':'');
+    s.style.animationDelay=i*0.055+'s';
+    el.appendChild(s);
+  });
+  document.getElementById('scnt').textContent=rawGloss.length+' signs';
+  qi=0; startQ();
+}
+
+async function translateWithClaude(txt){
+  // Get the list of available sign keys
+  const availableSigns = Object.keys(SIGNS).join(', ');
+  
+  const prompt = `You are an Indian Sign Language (ISL) gloss converter. Convert the given text into ISL gloss notation.
+
+ISL gloss rules:
+- Use Topic-Comment structure (object/subject first, then action/description)
+- Remove articles (a, an, the), conjunctions, and prepositions where not needed
+- Use base forms of verbs (no -ing, -ed suffixes)
+- Use uppercase for proper nouns
+- Output only the gloss words separated by spaces, no punctuation
+
+Available signs in the system (use ONLY these): ${availableSigns}
+
+Text to convert: "${txt}"
+
+Return ONLY a JSON array of sign keys from the available signs list, e.g. ["HELLO", "NAME", "WHAT"]. Use only signs from the available list. If a word isn't available, spell it letter by letter (single characters). Return only the JSON array, nothing else.`;
+
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1000,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+
+  if(!response.ok) throw new Error('API error');
+  const data = await response.json();
+  const text = data.content.map(i => i.text || "").join("").trim();
+  
+  // Parse JSON array from response
+  const fence = '```';
+  const clean = text.replace(new RegExp(fence + 'json|' + fence, 'g'), "").trim();
+  const arr = JSON.parse(clean);
+  
+  // Filter to only valid sign keys
+  return arr.filter(k => SIGNS[k] || (k.length === 1 && k.match(/[A-Z]/)));
+}
+
+function selLang(el, l){
+  document.querySelectorAll('.lchip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  lang = l;
+  renderQP(l);
+  // Update voice recognition language
+  if(recog) recog.stop();
+}
+
+function renderQP(l){
+  const en=['Hello','Hi, how are you?','I am fine','Thank you','Please help me','Excuse me','Sorry','Nice to meet you','Goodbye','What is your name?','I am hungry','I need water','I am tired',"Let's go",'Come here','Where is the restroom?',"It's an emergency",'I agree','See you later','Maybe'];
+  const lp={
+    hi:['नमस्ते','धन्यवाद','माफ़ी','मुझे पानी चाहिए','मैं भूखा हूँ','मुझे मदद चाहिए','शौचालय कहाँ है'],
+    te:['నమస్కారం','ధన్యవాదాలు','క్షమించండి','నాకు నీళ్ళు కావాలి','సహాయం చేయండి'],
+    ta:['வணக்கம்','நன்றி','மன்னிக்கவும்','எனக்கு தண்ணீர் வேண்டும்'],
+    ml:['നമസ്കാരം','നന്ദി','ക്ഷമിക്കണം','എനിക്ക് വെള്ളം വേണം'],
+    kn:['ನಮಸ್ಕಾರ','ಧನ್ಯವಾದ','ಕ್ಷಮಿಸಿ','ನನಗೆ ನೀರು ಬೇಕು'],
+    bn:['নমস্কার','ধন্যবাদ','ক্ষমা করবেন','আমার পানি দরকার'],
+    mr:['नमस्ते','धन्यवाद','माफ करा','मला पाणी हवे'],
+    gu:['નમસ્તે','આભાર','માફ કરો','મને પાણી જોઈએ'],
+    pa:['ਸਤ ਸ੍ਰੀ ਅਕਾਲ','ਧੰਨਵਾਦ','ਮਾਫ਼ ਕਰੋ'],
+  };
+  const phr = (l==='auto'||l==='en') ? en : (lp[l]||en.slice(0,6));
+  document.getElementById('qph').innerHTML=phr.map(p=>`<button class="qbtn" onclick="setEx('${p.replace(/'/g,"\\'")}')"> ${p}</button>`).join('');
+}
+
+function toggleVoice(){
+  const btn=document.getElementById('vbtn'), lbl=document.getElementById('vlbl');
+  if('webkitSpeechRecognition' in window||'SpeechRecognition' in window){
+    if(listening){if(recog) recog.stop(); return;}
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    recog=new SR();
+
+    // Language codes for speech recognition
+    const lc={en:'en-IN',hi:'hi-IN',te:'te-IN',ta:'ta-IN',ml:'ml-IN',kn:'kn-IN',bn:'bn-IN',mr:'mr-IN',gu:'gu-IN',pa:'pa-IN',ur:'ur-PK',or:'or-IN'};
+
+    // For auto-detect: use multilingual or fallback
+    if(lang === 'auto'){
+      // Try to use a broad multilingual setting — webkit supports 'en-US' as default
+      // We'll use en-IN and let auto-detect handle the script recognition
+      recog.lang = 'en-IN';
+    } else {
+      recog.lang = lc[lang] || 'en-IN';
+    }
+
+    recog.continuous = false;
+    recog.interimResults = false;
+
+    recog.onstart=()=>{listening=true;btn.classList.add('listening');lbl.textContent='Listening…';};
+    recog.onresult=e=>{
+      const t=e.results[0][0].transcript;
+      document.getElementById('tin').value=t;
+      updChar();
+      translate();
+    };
+    recog.onerror=recog.onend=()=>{
+      listening=false;
+      btn.classList.remove('listening');
+      lbl.textContent='Voice';
+    };
+    recog.start();
+  } else {
+    alert('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
+  }
+}
+
+function setEx(t){document.getElementById('tin').value=t;updChar();translate();}
+function updChar(){document.getElementById('cc').textContent=document.getElementById('tin').value.length+' / 500';}
+function clearAll(){
+  document.getElementById('tin').value='';
+  updChar();
+  document.getElementById('glossEl').innerHTML='<span class="glabel">ISL Gloss</span><span style="font-size:11px;color:var(--muted);font-style:italic">will appear after translation</span>';
+  document.getElementById('detectedLang').style.display='none';
+  stopQ();
+}
+function setSpd(s,el){spd=s;document.querySelectorAll('.spdBtn').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+function toggleRep(){rep=!rep;document.getElementById('rbtn').classList.toggle('on',rep);}
+
+// Expose functions globally for onclick handlers
+window.translate = translate;
+window.translateWithClaude = translateWithClaude;
+window.clearAll = clearAll;
+window.toggleVoice = toggleVoice;
+window.setEx = setEx;
+window.selLang = selLang;
+window.setSpd = setSpd;
+window.toggleRep = toggleRep;
+window.setViewMode = setViewMode;
+window.updChar = updChar;
+
+// Initial render
+renderQP('auto');
+resize();
+document.getElementById('tin').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();translate();}
+});
+
+// Handle resize for split mode canvas
+window.addEventListener('resize', ()=>{
+  resize();
+  const sl = document.getElementById('stageLeft');
+  if(sl && sl.style.display !== 'none'){
+    const W = sl.clientWidth;
+    cvS.width = W;
+    cvS.height = sl.clientHeight;
+    AV.oxS = W/2 - 100;
+    AV.oyS = sl.clientHeight/2 - 175;
+  }
+});
+</script>
+</body>
+</html>
